@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CA Final · Rank Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F0E8;--panel:#FFFFFF;--panel-2:#FBF9F4;
+  --ink:#20283A;--ink-soft:#5C6478;--ink-faint:#8A91A1;
+  --teal:#0E7C66;--teal-deep:#0A5444;--teal-soft:#E2F0EB;
+  --gold:#BE8A2C;--gold-soft:#F6ECD6;
+  --high:#D1544C;--high-bg:#FAE8E6;
+  --med:#6B7280;--med-bg:#EEF0F2;
+  --low:#AEB4BE;--low-bg:#F2F3F5;
+  --line:#E6E0D4;--line-strong:#D8D1C2;
+  --shadow:0 1px 2px rgba(32,40,58,.04),0 8px 24px rgba(32,40,58,.06);
+  --shadow-lg:0 2px 6px rgba(32,40,58,.06),0 18px 50px rgba(32,40,58,.10);
+  --r:16px;--r-sm:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(1200px 600px at 85% -10%,#FBF6EC 0%,rgba(251,246,236,0) 60%),radial-gradient(900px 500px at 0% 0%,#EFF4F1 0%,rgba(239,244,241,0) 55%),var(--paper);
+  color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px 90px}
+h1,h2,h3,.disp{font-family:'Fraunces',Georgia,serif;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
+
+.topbar{position:sticky;top:0;z-index:40;backdrop-filter:saturate(1.2) blur(8px);background:rgba(244,240,232,.86);border-bottom:1px solid var(--line)}
+.topbar .row{max-width:1120px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:600}
+.brand .mark{font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:var(--teal-deep);letter-spacing:-.02em;line-height:1}
+.brand .sub{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.spacer{flex:1}
+.engine{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--ink-soft);border:1px solid var(--line);background:var(--panel);padding:5px 10px;border-radius:99px}
+.engine .led{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.engine.live .led{background:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.engine.off .led{background:var(--ink-faint);box-shadow:0 0 0 3px var(--med-bg)}
+.mood-quick{display:flex;gap:4px;align-items:center}
+.mood-quick .lab{font-size:11px;color:var(--ink-faint);margin-right:3px;text-transform:uppercase;letter-spacing:.07em}
+.emoji-btn{border:1px solid var(--line);background:var(--panel);width:32px;height:32px;border-radius:9px;font-size:15px;display:grid;place-items:center;transition:transform .12s,border-color .12s}
+.emoji-btn:hover{transform:translateY(-2px)}
+.emoji-btn.sel{border-color:var(--teal);background:var(--teal-soft);box-shadow:0 0 0 2px var(--teal-soft)}
+.btn{border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);padding:8px 13px;border-radius:10px;font-weight:600;font-size:13px;transition:all .14s}
+.btn:hover{border-color:var(--teal);color:var(--teal-deep)}
+.btn.warm{background:var(--gold);border-color:var(--gold);color:#3a2c08}.btn.warm:hover{filter:brightness(1.04);color:#3a2c08}
+.btn.teal{background:var(--teal);border-color:var(--teal);color:#fff}.btn.teal:hover{filter:brightness(1.05);color:#fff}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-soft)}
+.btn.tiny{padding:5px 9px;font-size:12px;border-radius:8px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:18px;margin-top:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.gauge-card{padding:22px 24px;position:relative;overflow:hidden}
+.eyebrow{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:var(--teal);font-weight:700}
+.gauge-wrap{display:flex;align-items:center;gap:18px;margin-top:6px}
+.gauge-readout .big{font-family:'Fraunces',serif;font-weight:700;font-size:44px;line-height:1;color:var(--ink)}
+.gauge-readout .big .unit{font-size:17px;color:var(--ink-faint);font-weight:600}
+.gauge-readout .band{margin-top:5px;font-size:12.5px;color:var(--ink-soft)}
+.gauge-readout .band b{color:var(--gold);font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:99px;letter-spacing:.01em}
+.pill.on{background:var(--teal-soft);color:var(--teal-deep)}
+.pill.below{background:var(--high-bg);color:var(--high)}
+.risk-line{margin-top:12px;font-size:12.5px;color:var(--ink-soft);border-top:1px dashed var(--line-strong);padding-top:10px}
+.risk-line b{color:var(--high)}
+.side{display:flex;flex-direction:column;gap:14px}
+.count-card{padding:16px 18px;display:flex;gap:16px}
+.count{flex:1}
+.count .k{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+.count .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:29px;color:var(--ink);line-height:1.05;margin-top:4px}
+.count .v small{font-size:13px;color:var(--ink-faint);font-weight:500}
+.count.gate .v{color:var(--gold)}.count.attempt .v{color:var(--teal-deep)}
+.phase-strip{display:flex;align-items:center;gap:10px;padding:13px 18px}
+.phase-strip .dot{width:9px;height:9px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px var(--teal-soft)}
+.phase-strip .txt{font-size:12.5px;color:var(--ink-soft)}.phase-strip .txt b{color:var(--ink)}
+.streak{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;color:var(--gold);display:flex;align-items:center;gap:5px}
+
+.tabs{display:flex;gap:4px;margin:26px 0 16px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tab{border:none;background:none;padding:10px 13px;font-weight:600;font-size:14px;color:var(--ink-soft);border-bottom:2.5px solid transparent;border-radius:8px 8px 0 0;transition:color .12s}
+.tab:hover{color:var(--ink)}.tab.active{color:var(--teal-deep);border-bottom-color:var(--teal)}
+.tab .badge{display:inline-block;min-width:17px;padding:0 5px;height:17px;line-height:17px;text-align:center;font-size:10.5px;border-radius:9px;background:var(--high);color:#fff;font-family:'IBM Plex Mono',monospace;margin-left:5px;vertical-align:1px}
+.view{display:none;animation:fade .3s ease}.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin:4px 0 14px;flex-wrap:wrap}
+.sec-head h2{font-size:22px;margin:0}.sec-head .note{font-size:12.5px;color:var(--ink-faint)}
+
+.today-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+.task-card{padding:18px 20px}
+.task-card h3{font-size:16px;margin:0 0 2px}
+.task-meta{font-size:12.5px;color:var(--ink-faint);margin-bottom:14px}
+.task{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--panel-2);transition:border-color .12s,background .12s}
+.task:hover{border-color:var(--line-strong)}
+.task.done{background:var(--teal-soft);border-color:#CDE6DE}
+.task .chk{width:22px;height:22px;border-radius:7px;border:2px solid var(--line-strong);flex:none;margin-top:1px;display:grid;place-items:center;background:#fff;transition:all .14s;cursor:pointer}
+.task.done .chk{background:var(--teal);border-color:var(--teal);color:#fff}
+.task .body{flex:1;min-width:0}.task .lab{font-weight:600;font-size:14.5px}
+.task.done .lab{text-decoration:line-through;color:var(--ink-soft)}
+.task .hint{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
+.task .hrs{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--teal-deep);background:#fff;border:1px solid var(--line);padding:2px 7px;border-radius:7px;font-weight:600;white-space:nowrap}
+.wtag{font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:6px;text-transform:uppercase}
+.wtag.H{background:var(--high-bg);color:var(--high)}.wtag.M{background:var(--med-bg);color:var(--med)}.wtag.L{background:var(--low-bg);color:var(--low)}
+
+.pulse-card{padding:16px 18px;margin-bottom:16px;border-left:4px solid var(--gold)}
+.pulse-card h3{font-size:14px;margin:0 0 8px;display:flex;align-items:center;gap:7px}
+.pulse-item{font-size:13px;color:var(--ink);padding:7px 0;border-bottom:1px dashed var(--line);display:flex;gap:9px;align-items:flex-start}
+.pulse-item:last-child{border-bottom:none}
+.pulse-item .ic{flex:none;font-size:14px}
+.pulse-item.bad{color:#9c3b34}.pulse-item.good{color:var(--teal-deep)}
+
+.retest{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #EAD9B0;background:var(--gold-soft);border-radius:11px;margin-bottom:8px}
+.retest .nm{flex:1;font-size:13px;font-weight:600}
+.retest .sub{font-size:11px;color:var(--ink-faint)}
+
+.log-card{padding:18px 20px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:5px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;border:1px solid var(--line-strong);border-radius:10px;padding:9px 11px;font:inherit;color:var(--ink);background:#fff;outline:none;transition:border-color .12s,box-shadow .12s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+textarea{resize:vertical;min-height:64px}
+.hours-row{display:flex;align-items:center;gap:10px}.hours-row input{width:90px}
+.bar{height:9px;border-radius:99px;background:var(--low-bg);overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),#1ba888);border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+
+.subj{margin-bottom:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;box-shadow:var(--shadow)}
+.subj-head{display:flex;align-items:center;gap:14px;padding:15px 18px;cursor:pointer;user-select:none}
+.subj-head:hover{background:var(--panel-2)}
+.subj-tag{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:#fff;flex:none}
+.subj-info{flex:1;min-width:0}.subj-info .nm{font-weight:700;font-size:15.5px}
+.subj-info .full{font-size:12px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.subj-stats{display:flex;gap:16px;align-items:center}
+.statlet{text-align:right}.statlet .n{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;color:var(--ink)}
+.statlet .l{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint);font-weight:600}
+.rounds{display:flex;gap:4px}
+.rdot{width:18px;height:18px;border-radius:6px;border:1.6px solid var(--line-strong);display:grid;place-items:center;font-size:10px;font-weight:700;color:var(--ink-faint);background:#fff}
+.rdot.full{background:var(--teal);border-color:var(--teal);color:#fff}
+.caret{transition:transform .2s;color:var(--ink-faint)}.subj.open .caret{transform:rotate(90deg)}
+.subj-body{display:none;border-top:1px solid var(--line);padding:14px 18px 18px;background:var(--panel-2)}
+.subj.open .subj-body{display:block;animation:fade .25s}
+.subj-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.subj-toolbar .grow{flex:1}
+.mini-sel{font-size:12.5px;padding:6px 9px}
+.chip{font-size:11.5px;padding:5px 10px;border-radius:9px;border:1px solid var(--line-strong);background:#fff;color:var(--ink-soft);font-weight:600}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.rev-ctrl{display:flex;align-items:center;gap:6px}
+.chap{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;border:1px solid transparent;margin-bottom:5px}
+.chap:hover{border-color:var(--line)}
+.chap.H{background:linear-gradient(90deg,var(--high-bg),transparent 70%)}
+.chap.due{box-shadow:inset 3px 0 0 var(--gold)}
+.chap .stbtn{font-size:11px;font-weight:700;padding:4px 9px;border-radius:8px;border:1.5px solid var(--line-strong);background:#fff;color:var(--ink-soft);white-space:nowrap}
+.chap .stbtn.test{border-color:var(--teal);color:var(--teal-deep);background:var(--teal-soft)}
+.chap .ctxt{flex:1;font-size:13.5px}
+.chap.mastered .ctxt{color:var(--ink-soft)}
+.chap .wdot{width:9px;height:9px;border-radius:50%;flex:none}
+.wdot.H{background:var(--high)}.wdot.M{background:var(--med)}.wdot.L{background:var(--low)}
+.scoreb{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:2px 7px;border-radius:7px;white-space:nowrap}
+.scoreb.good{background:var(--teal-soft);color:var(--teal-deep)}
+.scoreb.mid{background:var(--gold-soft);color:var(--gold)}
+.scoreb.bad{background:var(--high-bg);color:var(--high)}
+.scoreb.none{background:var(--med-bg);color:var(--med)}
+.statedot{width:16px;height:16px;border-radius:50%;flex:none;border:2px solid var(--line-strong);background:#fff}
+.statedot.learned{border-color:var(--gold);background:var(--gold-soft)}
+.statedot.mastered{border-color:var(--teal);background:var(--teal)}
+.paper-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding:11px 13px;border-radius:11px;border:1px dashed var(--line-strong);background:#fff}
+.paper-row.ready{border-color:var(--teal);border-style:solid;background:var(--teal-soft)}
+.paper-row .pt{flex:1;font-size:13px}
+
+.marks-card{padding:20px 22px}
+.marks-grid{display:grid;grid-template-columns:1fr;gap:9px;margin-top:8px}
+.mrow{display:flex;align-items:center;gap:12px}
+.mrow .nm{width:60px;font-weight:700;font-size:13.5px}
+.mrow .role{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px}
+.role.strong{background:var(--gold-soft);color:var(--gold)}.role.sec{background:var(--med-bg);color:var(--med)}
+.mrow .track{flex:1}.mrow input[type=range]{width:100%;accent-color:var(--teal)}
+.mrow .val{width:44px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.tot-line{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line-strong)}
+.tot-line .tt{font-family:'Fraunces',serif;font-size:26px;font-weight:700}
+
+.mock-log{padding:18px 20px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.tbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);font-weight:700;padding:8px;border-bottom:1px solid var(--line)}
+.tbl td{padding:9px 8px;border-bottom:1px solid var(--line)}.tbl tr:hover td{background:var(--panel-2)}
+.score-pill{font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 8px;border-radius:7px;font-size:12.5px}
+.score-pill.good{background:var(--teal-soft);color:var(--teal-deep)}.score-pill.bad{background:var(--high-bg);color:var(--high)}
+
+.vault-subj{margin-bottom:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.vault-head{padding:12px 16px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--panel)}
+.vault-head:hover{background:var(--panel-2)}
+.vault-body{display:none;padding:12px 16px;border-top:1px solid var(--line);background:var(--panel-2)}
+.vault-subj.open .vault-body{display:block}
+.vault-links{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.vault-links a{font-size:12.5px;padding:6px 11px;border:1px solid var(--line-strong);border-radius:9px;background:#fff;font-weight:600}
+.vault-links a:hover{border-color:var(--teal);text-decoration:none}
+
+.leech{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;margin-bottom:8px;background:var(--panel)}
+.leech.done{opacity:.55}.leech .lx{flex:1}.leech .lx .t{font-weight:600;font-size:13.5px}
+.leech.done .lx .t{text-decoration:line-through}.leech .lx .s{font-size:11.5px;color:var(--ink-faint)}
+
+.well-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.spark{width:100%;height:54px;display:block}
+.why-box{padding:20px 22px;background:linear-gradient(135deg,var(--teal-deep),#0d6b58);color:#fff;border-radius:var(--r);box-shadow:var(--shadow-lg)}
+.why-box .q{font-family:'Fraunces',serif;font-size:18px;font-weight:600;line-height:1.35}
+.why-box textarea{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#fff;margin-top:10px}
+.why-box textarea::placeholder{color:rgba(255,255,255,.6)}
+.warn{padding:13px 16px;border-radius:12px;background:var(--high-bg);border:1px solid #F0CFCB;color:#9c3b34;font-size:13px;font-weight:600;display:flex;gap:9px;align-items:flex-start;margin-bottom:12px}
+.calm{padding:13px 16px;border-radius:12px;background:var(--teal-soft);border:1px solid #CDE6DE;color:var(--teal-deep);font-size:13px;margin-bottom:12px}
+
+.badday{display:none;text-align:center;padding:50px 24px}
+.badday.show{display:block;animation:fade .4s}
+.badday .moon{font-size:46px}.badday h2{font-size:26px;margin:14px 0 6px}
+.badday p{color:var(--ink-soft);max-width:440px;margin:0 auto 22px}.badday .one-task{max-width:440px;margin:0 auto;text-align:left}
+
+.muted{color:var(--ink-faint);font-size:12.5px}
+.empty{padding:26px;text-align:center;color:var(--ink-faint);font-size:13.5px;border:1px dashed var(--line-strong);border-radius:12px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:11px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-lg);opacity:0;transition:opacity .25s,transform .25s;z-index:120;pointer-events:none;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.row-flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.disclaimer{margin-top:16px;font-size:11.5px;color:var(--ink-faint);line-height:1.5}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:130}
+
+/* MODAL / EXAMINER */
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto;background:rgba(20,24,34,.5);backdrop-filter:blur(3px)}
+.modal.show{display:flex;animation:fade .25s}
+.sheet{background:var(--panel);border-radius:18px;max-width:680px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;margin:auto}
+.sheet-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.sheet-head .st-tag{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;font-family:'Fraunces',serif;font-weight:700;flex:none}
+.sheet-head .ttl{flex:1;min-width:0}
+.sheet-head .ttl .t{font-weight:700;font-size:15px}
+.sheet-head .ttl .s{font-size:12px;color:var(--ink-faint)}
+.sheet-head .x{border:none;background:none;font-size:22px;color:var(--ink-faint);line-height:1;padding:4px 8px}
+.sheet-body{padding:20px 22px;max-height:70vh;overflow:auto}
+.conf-row{display:flex;gap:8px;margin:10px 0 4px}
+.conf-row button{flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--line-strong);background:#fff;font-weight:600;font-size:13px}
+.conf-row button.sel{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-deep)}
+.qcard{border:1px solid var(--line);border-radius:13px;padding:15px 16px;margin-bottom:13px;background:var(--panel-2)}
+.qcard .qh{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.qcard .qn{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--teal-deep);font-size:13px}
+.qcard .qm{margin-left:auto;font-size:11px;font-weight:700;color:var(--ink-faint);background:#fff;border:1px solid var(--line);padding:2px 8px;border-radius:7px}
+.qcard .qtype{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:6px;background:var(--med-bg);color:var(--med)}
+.qcard .qtype.sum{background:var(--gold-soft);color:var(--gold)}
+.qcard .qtext{font-size:14px;font-weight:500;margin-bottom:10px;white-space:pre-wrap}
+.opt{display:flex;gap:9px;align-items:flex-start;padding:9px 11px;border:1.5px solid var(--line-strong);border-radius:10px;margin-bottom:7px;background:#fff;cursor:pointer;font-size:13.5px}
+.opt:hover{border-color:var(--teal)}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft)}
+.opt.wrong{border-color:var(--high);background:var(--high-bg)}
+.opt .ol{font-weight:700;color:var(--ink-soft);flex:none}
+.fb{margin-top:9px;font-size:12.5px;padding:9px 11px;border-radius:9px;line-height:1.45}
+.fb.good{background:var(--teal-soft);color:var(--teal-deep)}
+.fb.bad{background:var(--high-bg);color:#9c3b34}
+.fb.mid{background:var(--gold-soft);color:#7a5a16}
+.fb .pts{font-weight:700;font-family:'IBM Plex Mono',monospace}
+.loading{text-align:center;padding:34px 10px;color:var(--ink-soft)}
+.loading .spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 12px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.verdict{border-radius:14px;padding:18px 20px;margin-top:6px}
+.verdict.pass{background:var(--teal-soft);border:1px solid #CDE6DE}
+.verdict.weak{background:var(--gold-soft);border:1px solid #EAD9B0}
+.verdict.fail{background:var(--high-bg);border:1px solid #F0CFCB}
+.verdict .vscore{font-family:'Fraunces',serif;font-size:30px;font-weight:700}
+.verdict .vmsg{font-size:14px;margin-top:6px;line-height:1.5}
+.verdict .vnext{margin-top:10px;font-size:13px;font-weight:600}
+.verdict.fail .vscore,.verdict.fail .vmsg b{color:var(--high)}
+.verdict.pass .vscore{color:var(--teal-deep)}
+.sheet-foot{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;align-items:center}
+.examtimer{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ink);margin-right:auto;font-size:14px}
+.examtimer.low{color:var(--high)}
+.modenote{font-size:11.5px;color:var(--ink-faint);margin-right:auto}
+
+@media(max-width:860px){.hero{grid-template-columns:1fr}.today-grid,.well-grid{grid-template-columns:1fr}.gauge-readout .big{font-size:38px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="row">
+  <div class="brand"><span class="mark">CA&nbsp;Final</span><span class="sub">Rank&nbsp;Command&nbsp;Center</span></div>
+  <div class="spacer"></div>
+  <div class="engine" id="engine" title="Question engine status"><span class="led"></span><span id="engineTxt">Examiner: checking…</span></div>
+  <button class="engine" id="syncPill" title="Cloud sync across devices" style="cursor:pointer"><span class="led"></span><span id="syncTxt">Sync: off</span></button>
+  <div class="mood-quick" id="moodQuick">
+    <span class="lab">Mood</span>
+    <button class="emoji-btn" data-mood="1" title="Drained">😣</button>
+    <button class="emoji-btn" data-mood="2" title="Low">😕</button>
+    <button class="emoji-btn" data-mood="3" title="Okay">😐</button>
+    <button class="emoji-btn" data-mood="4" title="Good">🙂</button>
+    <button class="emoji-btn" data-mood="5" title="On fire">😄</button>
+  </div>
+  <button class="btn warm" id="badDayBtn">Bad day</button>
+  <button class="btn ghost tiny" id="exportBtn" title="Download a backup of all your progress">Export</button>
+  <button class="btn ghost tiny" id="importBtn" title="Restore from a backup file">Import</button>
+  <button class="btn ghost tiny" id="resetBtn">Reset</button>
+  <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+</div></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="card gauge-card">
+      <div class="eyebrow">Readiness · AIR 48</div>
+      <div class="gauge-wrap">
+        <svg id="gauge" width="150" height="150" viewBox="0 0 150 150"></svg>
+        <div class="gauge-readout">
+          <div class="big"><span id="projMarks">—</span><span class="unit">/600</span></div>
+          <div class="band">Target band <b>404–419</b> · projected from what you've <i>proven</i>, not ticked</div>
+          <div style="margin-top:8px"><span class="pill on" id="bandPill">Start testing to project</span></div>
+        </div>
+      </div>
+      <div class="risk-line" id="riskLine"></div>
+    </div>
+    <div class="side">
+      <div class="card count-card">
+        <div class="count attempt"><div class="k">May 2027 attempt</div><div class="v"><span id="cdAttempt">—</span> <small>days</small></div></div>
+        <div class="count gate"><div class="k">Phase gate · 15 Dec 2026</div><div class="v"><span id="cdGate">—</span> <small>days</small></div></div>
+      </div>
+      <div class="card phase-strip"><span class="dot"></span><span class="txt" id="phaseTxt">—</span><span class="streak" id="streakBox">🔥 0</span></div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-view="today">Today</button>
+    <button class="tab" data-view="subjects">Subjects</button>
+    <button class="tab" data-view="marks">Marks strategy</button>
+    <button class="tab" data-view="mocks">Mocks</button>
+    <button class="tab" data-view="papers">Papers vault</button>
+    <button class="tab" data-view="leech">Leech list <span class="badge" id="leechBadge" style="display:none">0</span></button>
+    <button class="tab" data-view="well">Wellbeing</button>
+  </div>
+
+  <div class="badday" id="badday">
+    <div class="moon">🌙</div><h2>One thing is enough today.</h2>
+    <p>The plan will wait. Resting on purpose is how you keep scoring in April. Do just this, then stop without guilt.</p>
+    <div class="one-task card task-card" id="oneTask"></div>
+    <div style="margin-top:20px"><button class="btn" id="exitBadDay">I'm okay — show my full plan</button></div>
+  </div>
+
+  <div class="view active" id="view-today">
+    <div class="card pulse-card" id="pulseCard"></div>
+    <div class="sec-head"><h2>Today's plan</h2><span class="note" id="todayDateNote"></span></div>
+    <div id="retestWrap"></div>
+    <div class="today-grid">
+      <div><div class="card task-card"><h3 id="planTitle">Plan</h3><div class="task-meta" id="planMeta"></div><div id="taskList"></div></div></div>
+      <div>
+        <div class="card log-card" style="margin-bottom:16px">
+          <h3 style="margin:0 0 12px;font-size:15px">Log today</h3>
+          <div class="field"><label>Hours studied today</label><div class="hours-row"><input type="number" id="hoursIn" min="0" max="20" step="0.5" placeholder="0"/><span class="muted" id="hoursTarget"></span></div></div>
+          <div class="field" style="margin-bottom:6px"><label>Energy right now</label><div class="mood-quick" id="energyRow"><button class="emoji-btn" data-energy="1">🪫</button><button class="emoji-btn" data-energy="2">🔋</button><button class="emoji-btn" data-energy="3">⚡</button><button class="emoji-btn" data-energy="4">🚀</button></div></div>
+        </div>
+        <div class="card log-card">
+          <h3 style="margin:0 0 4px;font-size:15px">Prove it — high-yield, untested</h3>
+          <div class="muted" style="margin-bottom:10px">High-weightage chapters you haven't been tested on. These are marks at risk. Tap to be examined now.</div>
+          <div id="focusList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-subjects">
+    <div class="sec-head"><h2>Subjects &amp; chapters</h2><span class="note">○ untouched · <span style="color:var(--gold)">◐</span> studied · <span style="color:var(--teal)">●</span> mastered (tested). Tick = "test me".</span></div>
+    <div id="subjList"></div>
+    <div class="disclaimer" id="weightNote"></div>
+  </div>
+
+  <div class="view" id="view-marks">
+    <div class="sec-head"><h2>Marks strategy</h2><span class="note">Engineer the 404–419 band. Strong subjects carry the average.</span></div>
+    <div class="card marks-card">
+      <div class="marks-grid" id="marksGrid"></div>
+      <div class="tot-line"><div><div class="muted">Planned total</div><div class="tt"><span id="marksTotal">0</span> <span class="muted" style="font-size:15px">/ 600</span></div></div>
+        <div style="text-align:right"><div class="muted">Status vs AIR-48 band</div><div id="marksStatus" style="font-weight:700;margin-top:3px"></div></div></div>
+      <div id="carryNote" class="calm" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <div class="view" id="view-mocks">
+    <div class="sec-head"><h2>Mock &amp; paper tracker</h2><span class="note">Full-subject papers auto-appear here once a subject is mastered. Log externally-taken papers too.</span></div>
+    <div class="card mock-log" style="margin-bottom:16px">
+      <h3 style="margin:0 0 12px;font-size:15px">Log a paper</h3>
+      <div class="row-flex" style="align-items:flex-end">
+        <div class="field" style="margin:0;min-width:150px"><label>Subject</label><select id="mkSubj"></select></div>
+        <div class="field" style="margin:0;width:140px"><label>Date</label><input type="date" id="mkDate"></div>
+        <div class="field" style="margin:0;width:110px"><label>Content /70</label><input type="number" id="mkContent" min="0" max="70" step="1"></div>
+        <div class="field" style="margin:0;width:140px"><label>Presentation /30</label><input type="number" id="mkPres" min="0" max="30" step="1"></div>
+        <div class="field" style="margin:0;width:110px"><label>Time (min)</label><input type="number" id="mkTime" min="0" max="300" step="5"></div>
+        <button class="btn" id="mkAdd" style="margin-bottom:14px">Add paper</button>
+      </div>
+      <div class="field" style="margin-top:4px;margin-bottom:0"><input type="text" id="mkLeech" placeholder="What tripped you up? (optional → adds to Leech list)"></div>
+    </div>
+    <div id="mockBySubject"></div>
+  </div>
+
+  <div class="view" id="view-papers">
+    <div class="sec-head"><h2>Papers vault</h2><span class="note">Past papers · MTPs · RTPs, all in one place.</span></div>
+    <div class="calm">ICAI hosts official files on the BoS Knowledge Portal. Buttons open the right ICAI pages; deep links shift each cycle, so pin exact PDFs with "+ link" — they're saved here.</div>
+    <div id="vaultList"></div>
+  </div>
+
+  <div class="view" id="view-leech">
+    <div class="sec-head"><h2>Leech list</h2><span class="note">Recurring weak spots. In the final months you revise these — not the whole book.</span></div>
+    <div class="card log-card" style="margin-bottom:16px"><div class="row-flex" style="align-items:flex-end">
+      <div class="field" style="margin:0;flex:1;min-width:200px"><label>Weak concept / repeated mistake</label><input type="text" id="lcText" placeholder="e.g. Ind AS 103 — bargain purchase treatment"></div>
+      <div class="field" style="margin:0;width:150px"><label>Subject</label><select id="lcSubj"></select></div>
+      <button class="btn" id="lcAdd" style="margin-bottom:14px">Add</button></div></div>
+    <div id="leechList"></div>
+  </div>
+
+  <div class="view" id="view-well">
+    <div class="sec-head"><h2>Wellbeing</h2><span class="note">Tracked as seriously as marks — because burnout costs marks.</span></div>
+    <div id="restWarn"></div>
+    <div class="well-grid">
+      <div class="card log-card"><h3 style="margin:0 0 4px;font-size:15px">Mood — last 14 days</h3><div class="muted" style="margin-bottom:6px">Tap the faces up top each day.</div><svg class="spark" id="moodSpark" viewBox="0 0 300 54" preserveAspectRatio="none"></svg><div id="moodReadout" class="muted" style="margin-top:8px"></div></div>
+      <div class="card log-card"><h3 style="margin:0 0 4px;font-size:15px">Weekly hours — target vs actual</h3><div class="muted" style="margin-bottom:6px">Phase 1 ≈ 28 h/wk · Phase 2 ≈ 90 h/wk (one lighter day).</div><svg class="spark" id="hoursChart" viewBox="0 0 300 54" preserveAspectRatio="none"></svg><div id="hoursReadout" class="muted" style="margin-top:8px"></div></div>
+    </div>
+    <div class="why-box" style="margin-top:18px"><div class="q" id="motivLine"></div><textarea id="whyNote" placeholder="Write why this rank matters to you. Read it on the hard days."></textarea></div>
+  </div>
+
+  <div class="disclaimer" id="footNote"></div>
+</div>
+
+<!-- EXAMINER MODAL -->
+<div class="modal" id="examModal"><div class="sheet">
+  <div class="sheet-head">
+    <div class="st-tag" id="exTag">?</div>
+    <div class="ttl"><div class="t" id="exTitle">Examiner</div><div class="s" id="exSub"></div></div>
+    <div class="examtimer" id="exTimer" style="display:none"></div>
+    <button class="x" id="exClose">×</button>
+  </div>
+  <div class="sheet-body" id="exBody"></div>
+  <div class="sheet-foot" id="exFoot"></div>
+</div></div>
+
+<div class="modal" id="syncModal"><div class="sheet" style="max-width:540px">
+  <div class="sheet-head"><div class="st-tag" style="background:#1C6FB0">☁</div><div class="ttl"><div class="t">Cloud sync</div><div class="s">Sync progress across your phone & laptop</div></div><button class="x" id="syncClose">×</button></div>
+  <div class="sheet-body" id="syncBody"></div>
+</div></div>
+
+<div class="modal" id="quoteModal"><div class="sheet" style="max-width:480px">
+  <div class="sheet-body" style="text-align:center;padding:34px 26px;max-height:none">
+    <div style="font-size:30px;margin-bottom:6px">🎯</div>
+    <div class="eyebrow" style="text-align:center">Today's rank reminder</div>
+    <div class="disp" id="quoteText" style="font-size:21px;line-height:1.4;margin:14px 0 4px"></div>
+    <div class="muted" id="quoteDays" style="margin-top:12px"></div>
+  </div>
+  <div class="sheet-foot" style="justify-content:center"><button class="btn teal" id="quoteGo">Let's earn it today</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ CONSTANTS ============ */
+const ATTEMPT="2027-05-02",GATE="2026-12-15";
+const C=(name,w)=>({n:name,w:w});
+const SUBJECTS={
+ FR:{name:"FR",full:"Financial Reporting",group:1,color:"#0E7C66",targetRev:3,role:"sec",practical:true,dur:180,chapters:[
+   C("Conceptual Framework under Ind AS","M"),C("Ind AS 1 — Presentation of Financial Statements","M"),C("Ind AS 7 — Statement of Cash Flows","M"),C("Ind AS 8 — Policies, Estimates & Errors","M"),C("Ind AS 34 — Interim Financial Reporting","L"),C("Ind AS 10 — Events after Reporting Period","L"),C("Ind AS 113 — Fair Value Measurement","M"),C("Ind AS 115 — Revenue from Contracts","H"),C("Ind AS 2 — Inventories","L"),C("Ind AS 16 — Property, Plant & Equipment","M"),C("Ind AS 116 — Leases","H"),C("Ind AS 23 — Borrowing Costs","L"),C("Ind AS 36 — Impairment of Assets","M"),C("Ind AS 38 — Intangible Assets","M"),C("Ind AS 40 — Investment Property","L"),C("Ind AS 105 — Non-current Assets Held for Sale","L"),C("Ind AS 41 — Agriculture","L"),C("Ind AS 19 — Employee Benefits","M"),C("Ind AS 20 — Government Grants","L"),C("Ind AS 21 — Foreign Exchange Rates","M"),C("Ind AS 102 — Share-based Payment","M"),C("Ind AS 37 — Provisions & Contingencies","M"),C("Ind AS 12 — Income Taxes","H"),C("Financial Instruments (32/109/107)","H"),C("Ind AS 110 — Consolidated Financial Statements","H"),C("Ind AS 103 — Business Combinations","H"),C("Ind AS 111/28 — Joint Arrangements & Associates","M"),C("Ind AS 27 — Separate Financial Statements","L"),C("Ind AS 33 — Earnings Per Share","M"),C("Ind AS 24 — Related Party Disclosures","L"),C("Ind AS 108 — Operating Segments","L"),C("Analysis of Financial Statements","M"),C("Integrated & Sustainability / CSR Reporting","L"),C("Ethics & Professional Duties of a CA","M"),
+ ]},
+ AFM:{name:"AFM",full:"Advanced Financial Management",group:1,color:"#1C6FB0",targetRev:3,role:"strong",practical:true,dur:180,chapters:[
+   C("Financial Policy & Corporate Strategy","L"),C("Risk Management","M"),C("Advanced Capital Budgeting Decisions","H"),C("Security Analysis","M"),C("Security Valuation","H"),C("Portfolio Management","H"),C("Securitization","L"),C("Mutual Funds","M"),C("Derivatives Analysis & Valuation","H"),C("Foreign Exchange Exposure & Risk Mgmt","H"),C("International Financial Management","M"),C("Interest Rate Risk Management","M"),C("Business Valuation","H"),C("Mergers, Acquisitions & Restructuring","H"),C("Startup Finance","L"),
+ ]},
+ Audit:{name:"AUD",full:"Adv. Auditing, Assurance & Professional Ethics",group:1,color:"#7A4FB5",targetRev:4,role:"strong",practical:false,dur:180,chapters:[
+   C("Quality Control (SQC 1 / SA 220)","M"),C("General Auditing Principles & Responsibilities","M"),C("Audit Planning, Strategy & Execution","M"),C("Risk Assessment & Internal Control","H"),C("Audit Evidence","H"),C("Completion & Review","M"),C("Audit Report (SA 700 series)","H"),C("Specialised Areas / Items","M"),C("Audit-related & Assurance Services","L"),C("Review of Financial Information","L"),C("Digital Auditing & Assurance","M"),C("Group Audits","M"),C("Audit of Banks","M"),C("Audit of NBFCs","L"),C("Audit of PSUs","L"),C("Internal Audit","M"),C("Due Diligence, Investigation & Forensic Accounting","M"),C("Sustainability / SDG Assurance","L"),C("Company Audit","H"),C("Standards on Auditing — consolidated","H"),C("Professional Ethics & Liabilities (Code of Ethics)","H"),
+ ]},
+ DT:{name:"DT",full:"Direct Tax Laws & International Taxation",group:2,color:"#B5532E",targetRev:4,role:"sec",practical:true,dur:180,chapters:[
+   C("Basics, Residence & Scope of Income","L"),C("Salaries","L"),C("House Property","L"),C("Profits & Gains of Business/Profession","H"),C("Capital Gains","H"),C("Income from Other Sources","M"),C("Clubbing of Income","L"),C("Set-off & Carry Forward of Losses","M"),C("Deductions (Chapter VI-A)","M"),C("Assessment of Firms, AOP/BOI, Co-ops","M"),C("Taxation of Companies & MAT","H"),C("Trusts & Charitable Institutions","M"),C("Business Reorganisation / Amalgamation","M"),C("Assessment Procedure","M"),C("Appeals & Revision","M"),C("Penalties & Prosecution","M"),C("TDS / TCS & Advance Tax","H"),C("Tax Planning, GAAR & Avoidance","M"),C("Liability in Special Cases / Deemed Income","L"),C("Transfer Pricing","H"),C("Non-Resident Taxation","H"),C("Double Taxation Relief (DTAA)","H"),C("Advance Rulings","L"),C("Equalisation Levy & Digital Taxation","M"),C("Overview of BEPS","M"),C("Interpretation of Tax Treaties & Model Conventions","M"),
+ ]},
+ GST:{name:"IDT",full:"Indirect Tax Laws — GST + Customs & FTP",group:2,color:"#1E8A8A",targetRev:4,role:"strong",practical:true,dur:180,chapters:[
+   C("GST — Supply under GST","H"),C("GST — Charge of GST","H"),C("GST — Place of Supply","H"),C("GST — Time of Supply","M"),C("GST — Value of Supply","H"),C("GST — Input Tax Credit","H"),C("GST — Registration","M"),C("GST — Tax Invoice, Credit & Debit Notes","M"),C("GST — Accounts, Records & E-way Bill","M"),C("GST — Payment of Tax","M"),C("GST — TDS & TCS","L"),C("GST — Returns","M"),C("GST — Refunds","M"),C("GST — Import & Export under GST","M"),C("GST — Job Work","L"),C("GST — Assessment & Audit","M"),C("GST — Inspection, Search, Seizure & Arrest","L"),C("GST — Demands & Recovery","M"),C("GST — Liability to Pay in Certain Cases","L"),C("GST — Offences & Penalties","M"),C("GST — Appeals & Revision","M"),C("GST — Advance Ruling","L"),C("GST — Miscellaneous Provisions","L"),C("Customs — Levy & Exemptions","H"),C("Customs — Types of Duty","M"),C("Customs — Valuation","H"),C("Customs — Import/Export Procedures","M"),C("Customs — Warehousing","L"),C("Customs — Duty Drawback","M"),C("Customs — Refund","L"),C("Foreign Trade Policy (FTP)","M"),
+ ]},
+ IBS:{name:"IBS",full:"Integrated Business Solutions (multidisciplinary, open book)",group:2,color:"#6B6F2E",targetRev:3,role:"sec",practical:true,dur:240,chapters:[
+   C("Strategic Mgmt — Introduction to Strategy","M"),C("Strategic Mgmt — Strategic Analysis","H"),C("Strategic Mgmt — Strategic Choices","M"),C("Strategic Mgmt — Implementation & Evaluation","M"),C("Integration — Corporate & Economic Laws","H"),C("Integration — Financial Reporting application","M"),C("Integration — Audit & Ethics application","M"),C("Integration — Direct Tax application","M"),C("Integration — Indirect Tax (GST) application","M"),C("Integration — Cost & Performance Management","M"),C("Integration — Financial Management application","M"),C("Comprehensive Multidisciplinary Case Studies","H"),
+ ]},
+};
+const ORDER=["FR","AFM","Audit","GST","DT","IBS"];
+const DEFAULT_TARGETS={FR:62,AFM:74,Audit:76,GST:74,DT:60,IBS:65};
+const MOTIV=["Rank is built on ordinary days done well — not heroic ones.","Revise your mistakes, not the whole book. The Leech list is your edge.","Presentation marks are the cheapest marks in the exam. Train them.","Consistency at 70% beats intensity that burns out by March.","High-weightage chapters first. Always.","A lighter day is part of the plan, not a failure of it.","404 marks is 6 disciplined subjects, not 1 perfect one.","Being tested harder than the exam is how the exam feels easy."];
+const RANKQUOTES=[
+ "A rank is not extra talent — it's the same syllabus, tested on yourself harder and earlier than everyone else.",
+ "The rank-holder and the just-passed student read the same books. The difference is the rank-holder proved it under timed pressure, again and again.",
+ "Every high-weightage chapter you leave untested is a seat in the rank list you're handing to someone else.",
+ "Toppers don't fear the hard question — they've already failed it in practice and fixed it. Go find yours today.",
+ "You won't rise to the level of the exam. You'll fall to the level of your revision. Make revision relentless.",
+ "Marks live in presentation, sections quoted, and clean workings — not just in knowing. Write like an examiner is counting.",
+ "The gap between 60 and 75 is not intelligence. It's the third and fourth revision most people never do.",
+ "Discipline on the dull Tuesday in August is what the rank list in May is made of.",
+ "Your weakest tested chapter is your real score. Strengthen the floor, not the ceiling.",
+ "Confidence without a tested score is just hope. Go convert one chapter from 'I think I know it' to 'I proved it.'",
+ "Rank-holders finish the syllabus early and spend the last months sharpening. Protect your timeline like it's the rank itself.",
+ "One full paper under the clock teaches more than a week of comfortable reading. Earn the right to sit it.",
+];
+const PASS=60, SPACING=[2,7,21,45,90];
+
+/* ============ STORAGE ============ */
+const KEY="ca_cmd_center_v2";
+const hasStore=(typeof window!=="undefined" && window.storage && typeof window.storage.get==="function");
+let lsOK=false; try{ if(typeof localStorage!=="undefined"){ localStorage.setItem("__cc_t","1"); localStorage.removeItem("__cc_t"); lsOK=true; } }catch(e){ lsOK=false; }
+let mem=null;
+async function loadState(){
+  if(hasStore){ try{const r=await window.storage.get(KEY); if(r&&r.value) return JSON.parse(r.value);}catch(e){} return null; }
+  if(lsOK){ try{const v=localStorage.getItem(KEY); if(v) return JSON.parse(v);}catch(e){} return null; }
+  return mem;
+}
+let saveT=null;
+function persistLocal(){ const d=JSON.stringify(S);
+  if(hasStore){ clearTimeout(saveT); saveT=setTimeout(async()=>{try{await window.storage.set(KEY,d);}catch(e){}},250); }
+  else if(lsOK){ try{localStorage.setItem(KEY,d);}catch(e){} }
+  else mem=JSON.parse(d);
+}
+function saveState(){ persistLocal(); if(typeof cloud!=="undefined"&&cloud&&cloud.user) cloudPush(); }
+function saveLocalOnly(){ persistLocal(); }
+
+/* ============ STATE ============ */
+let S=null;
+function freshChapter(){return{learned:false,mastered:false,score:null,conf:null,tested:null,next:null,attempts:0};}
+function freshState(){const subj={};for(const k of ORDER){subj[k]={round:0,chapters:SUBJECTS[k].chapters.map(freshChapter),paper:null};}return{subjects:subj,targets:{...DEFAULT_TARGETS},mocks:[],leech:[],days:{},why:"",vault:{},ver:2};}
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const todayStr=()=>new Date().toLocaleDateString('en-CA');
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x.toLocaleDateString('en-CA');}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+function inPhase1(d){return daysBetween(d,GATE)>=0;}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove("show"),2400);}
+function day(d){if(!S.days[d])S.days[d]={done:[],hours:0,mood:0,energy:0,bad:false};return S.days[d];}
+function cstate(k,i){return S.subjects[k].chapters[i];}
+
+/* ============ AI ENGINE ============ */
+let ENGINE="checking"; // checking | live | offline
+function setEngine(e){ENGINE=e;const el=$("#engine");el.className="engine "+(e==="live"?"live":e==="offline"?"off":"");$("#engineTxt").textContent=e==="live"?"Examiner: live AI":e==="offline"?"Examiner: offline bank":"Examiner: checking…";}
+async function callAI(system,user){
+  const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:system,messages:[{role:"user",content:user}]})});
+  if(!res.ok) throw new Error("http "+res.status);
+  const data=await res.json();
+  const text=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+  if(!text) throw new Error("empty");
+  return text;
+}
+function parseJSON(t){let s=t.trim().replace(/^```(json)?/i,"").replace(/```$/,"").trim();
+  const a=s.indexOf("{"),b=s.lastIndexOf("}");if(a>0||b<s.length-1){s=s.slice(a,b+1);}return JSON.parse(s);}
+
+async function genQuestions(k,i){
+  const sp=SUBJECTS[k], ch=sp.chapters[i];
+  const sys="You are a strict ICAI CA Final examiner (new scheme). You set rank-grade questions and never inflate difficulty. Output ONLY compact minified JSON, no prose, no markdown.";
+  const usr=`Set exactly 5 questions on the chapter "${ch.n}" of paper "${sp.full}" for CA Final (current applicable provisions). `+
+    `Difficulty MUST escalate: Q1 easy recall (exam level), Q2-Q3 application (exam level), Q4 hard, Q5 above-exam rank-grade. `+
+    (sp.practical?`Include at least ONE numerical sum worth 5-10 marks requiring full workings. `:`This is a theory paper — include at least one descriptive question that demands correct structure, section/standard quoting and keywords. `)+
+    `Return JSON: {"q":[{"t":"mcq|desc|sum","m":<marks>,"q":"<question>","o":["a","b","c","d"](mcq only),"c":<0-3 correct index, mcq only>,"e":"<1-line explanation, mcq>","p":["marking point 1","point 2","point 3"](desc/sum only)}]}. Keep marking points to max 4 short bullets. Be concise to fit the limit.`;
+  const data=parseJSON(await callAI(sys,usr));
+  if(!data.q||!data.q.length) throw new Error("noq");
+  return data.q;
+}
+async function evalAnswers(k,i,items){ // items: [{q,m,p,ans}]
+  const sp=SUBJECTS[k], ch=sp.chapters[i];
+  const sys="You are a strict but fair ICAI CA Final examiner. Grade honestly against marking points; do NOT inflate. Output ONLY minified JSON.";
+  const theory=!sp.practical||/Audit/.test(k);
+  const usr=`Grade these student answers for "${ch.n}" (${sp.full}). For each: award marks out of max against the marking points, and give ONE specific line of feedback. `+
+    (theory?`Assess presentation too — structure, section/standard quoting, keywords. `:`Check correct method, formula and final figure for sums. `)+
+    `For ANY answer scoring below 70% of its max, also include: "a" = the FULL correct model answer / ideal solution (with workings/steps for sums, key points & section/standard references for theory), and "w" = one blunt line on exactly where the student went wrong. For answers at/above 70%, omit "a" and "w". `+
+    `Be direct; reward only what's actually there. Items:\n`+JSON.stringify(items)+
+    `\nReturn JSON: {"r":[{"s":<marks awarded>,"m":<max>,"f":"<feedback>","a":"<model answer if weak>","w":"<where wrong if weak>"}]} in the same order.`;
+  const data=parseJSON(await callAI(sys,usr));
+  if(!data.r) throw new Error("noeval");
+  return data.r;
+}
+/* offline fallback question generator (self-graded) */
+function offlineQuestions(k,i){
+  const sp=SUBJECTS[k], ch=sp.chapters[i], nm=ch.n.replace(/^.*— /,"");
+  const qs=[
+    {t:"desc",m:4,q:`Recall (exam level): State the core scope and the key provisions of "${nm}". List at least 4 points an examiner expects.`,p:["4+ correct scope/provision points","right terminology"],self:true},
+    {t:"desc",m:5,q:`Application (exam level): Explain how "${nm}" is applied in a typical CA Final scenario. Give the treatment with reasoning.`,p:["correct treatment","reasoning/justification","reference to standard/section"],self:true},
+    {t:sp.practical?"sum":"desc",m:sp.practical?8:6,q:sp.practical?`Practical sum (5-10 marks): Attempt one full numerical problem on "${nm}" from your study material/RTP under timed conditions. Show complete workings.`:`Hard (above exam): Write a structured answer on a contentious/nuanced area of "${nm}", quoting the relevant authority.`,p:["correct method & workings","accurate final figure / correct conclusion","presentation & quoting"],self:true},
+    {t:"desc",m:5,q:`Rank-grade twist (above exam): Take the trickiest sub-point of "${nm}" — the one students get wrong — and explain it precisely with an example.`,p:["identifies the genuinely hard point","precise, correct explanation","worked example"],self:true},
+  ];
+  return qs;
+}
+
+/* ============ EXAMINER MODAL ============ */
+let EX=null; // {k,i,questions,conf,phase}
+function openExaminer(k,i){
+  const sp=SUBJECTS[k];
+  EX={k,i,questions:null,conf:null,answers:{}};
+  $("#exTag").style.background=sp.color; $("#exTag").textContent=sp.name;
+  $("#exTitle").textContent=sp.chapters[i].n;
+  $("#exSub").textContent=sp.full+" · "+({H:"high",M:"medium",L:"low"}[sp.chapters[i].w])+"-weightage chapter";
+  $("#exTimer").style.display="none";
+  $("#examModal").classList.add("show");
+  renderConfStep();
+}
+function closeExaminer(){$("#examModal").classList.remove("show");EX=null;}
+function renderConfStep(){
+  const b=$("#exBody");
+  b.innerHTML=`<p style="margin:0 0 4px;font-weight:600">Before you're tested — how confident are you on this chapter?</p>
+   <p class="muted" style="margin:0 0 10px">This is the honesty check. If you feel strong but score weak, that gap is exactly where ranks are lost — and the app will say so.</p>
+   <div class="conf-row" id="confRow">
+     ${[1,2,3,4,5].map(n=>`<button data-c="${n}">${["Shaky","Unsure","Okay","Solid","Bulletproof"][n-1]}</button>`).join("")}
+   </div>`;
+  b.querySelectorAll("#confRow button").forEach(btn=>btn.addEventListener("click",()=>{
+    EX.conf=+btn.dataset.c; b.querySelectorAll("#confRow button").forEach(x=>x.classList.toggle("sel",x===btn));
+    $("#exFoot").querySelector("#exStart").disabled=false;
+  }));
+  $("#exFoot").innerHTML=`<span class="modenote">${ENGINE==="live"?"Live AI examiner — fresh graded questions":"Offline mode — self-graded practice set"}</span>
+    <button class="btn" id="exCancel">Cancel</button><button class="btn teal" id="exStart" disabled>Start test</button>`;
+  $("#exCancel").onclick=closeExaminer;
+  $("#exStart").onclick=startTest;
+}
+async function startTest(){
+  const b=$("#exBody");
+  b.innerHTML=`<div class="loading"><div class="spin"></div><div>Setting your questions…</div><div class="muted" style="margin-top:6px">Escalating from exam-level to rank-grade.</div></div>`;
+  $("#exFoot").innerHTML=`<span class="modenote">Hold on…</span>`;
+  let qs=null, live=false;
+  if(ENGINE!=="offline"){
+    try{ qs=await genQuestions(EX.k,EX.i); live=true; setEngine("live"); }
+    catch(e){ qs=null; if(ENGINE==="checking")setEngine("offline"); }
+  }
+  if(!qs){ qs=offlineQuestions(EX.k,EX.i); live=false; if(ENGINE!=="live")setEngine("offline"); }
+  EX.questions=qs; EX.live=live;
+  renderQuestions();
+}
+function renderQuestions(){
+  const b=$("#exBody"); b.innerHTML="";
+  EX.questions.forEach((q,idx)=>{
+    const card=document.createElement("div"); card.className="qcard";
+    const typeLabel=q.t==="mcq"?"MCQ":q.t==="sum"?"Sum":"Descriptive";
+    let inner=`<div class="qh"><span class="qn">Q${idx+1}</span><span class="qtype ${q.t==="sum"?"sum":""}">${typeLabel}</span><span class="qm">${q.m} marks</span></div>
+      <div class="qtext">${escapeHtml(q.q)}</div>`;
+    if(q.t==="mcq"&&q.o){
+      inner+=`<div class="opts" data-q="${idx}">`+q.o.map((o,oi)=>`<div class="opt" data-q="${idx}" data-o="${oi}"><span class="ol">${String.fromCharCode(65+oi)}</span><span>${escapeHtml(o)}</span></div>`).join("")+`</div>`;
+    } else {
+      inner+=`<textarea data-ans="${idx}" placeholder="Write your answer / workings here…"></textarea>`;
+      if(!EX.live) inner+=`<div class="muted" style="margin-top:6px">Offline: after submitting, self-mark honestly against the suggested points.</div>`;
+    }
+    card.innerHTML=inner; b.appendChild(card);
+  });
+  b.querySelectorAll(".opt").forEach(o=>o.addEventListener("click",()=>{
+    const qi=+o.dataset.q; b.querySelectorAll(`.opt[data-q="${qi}"]`).forEach(x=>x.classList.remove("sel")); o.classList.add("sel"); EX.answers[qi]=+o.dataset.o;
+  }));
+  $("#exFoot").innerHTML=`<span class="modenote">${EX.live?"Graded by the AI examiner":"Self-graded — be honest"}</span>
+    <button class="btn" id="exCancel">Cancel</button><button class="btn teal" id="exSubmit">Submit for grading</button>`;
+  $("#exCancel").onclick=closeExaminer; $("#exSubmit").onclick=submitTest;
+}
+async function submitTest(){
+  const b=$("#exBody");
+  // collect text answers
+  b.querySelectorAll("textarea[data-ans]").forEach(t=>{EX.answers["t"+t.dataset.ans]=t.value.trim();});
+  let totalMax=0, totalGot=0, results=[];
+  // grade MCQs locally
+  const evalItems=[]; const evalMap=[];
+  EX.questions.forEach((q,idx)=>{
+    totalMax+=q.m;
+    if(q.t==="mcq"){
+      const sel=EX.answers[idx]; const correct=(sel===q.c); const got=correct?q.m:0; totalGot+=got;
+      results[idx]={type:"mcq",got,max:q.m,correct,sel,c:q.c,e:q.e||""};
+    } else {
+      if(EX.live){ evalItems.push({q:q.q,m:q.m,p:q.p||[],ans:EX.answers["t"+idx]||"(blank)"}); evalMap.push(idx); results[idx]={type:q.t,pending:true,max:q.m}; }
+      else { results[idx]={type:q.t,self:true,max:q.m,p:q.p||[],ans:EX.answers["t"+idx]||""}; }
+    }
+  });
+  if(EX.live && evalItems.length){
+    $("#exFoot").innerHTML=`<span class="modenote">Examiner is marking your answers…</span>`;
+    b.insertAdjacentHTML("afterbegin",`<div class="loading" id="gradeLoad"><div class="spin"></div><div>Marking against ICAI marking points…</div></div>`);
+    try{
+      const r=await evalAnswers(EX.k,EX.i,evalItems);
+      r.forEach((res,n)=>{const idx=evalMap[n];const got=Math.max(0,Math.min(results[idx].max,+res.s||0));results[idx].got=got;results[idx].f=res.f||"";results[idx].a=res.a||"";results[idx].w=res.w||"";results[idx].q=EX.questions[idx].q;results[idx].pending=false;totalGot+=got;});
+    }catch(e){ // fall to self-grade
+      evalMap.forEach(idx=>{results[idx].pending=false;results[idx].self=true;results[idx].p=EX.questions[idx].p||[];results[idx].ans=EX.answers["t"+idx]||"";});
+      toast("AI grading hiccup — self-mark these.");
+    }
+    const gl=$("#gradeLoad"); if(gl)gl.remove();
+  }
+  // if any self-grade items, show self-grade UI and wait
+  const selfIdx=results.map((r,i)=>r&&r.self?i:-1).filter(i=>i>=0);
+  if(selfIdx.length){ renderSelfGrade(results,selfIdx,totalMax); return; }
+  finishTest(results,totalGot,totalMax);
+}
+function renderSelfGrade(results,selfIdx,totalMax){
+  const b=$("#exBody");
+  selfIdx.forEach(idx=>{
+    const q=EX.questions[idx];
+    const card=b.querySelectorAll(".qcard")[idx];
+    if(card.querySelector(".selfgrade"))return;
+    const pts=(q.p||[]).map(p=>`<li>${escapeHtml(p)}</li>`).join("");
+    const div=document.createElement("div"); div.className="selfgrade fb mid";
+    div.innerHTML=`<div style="font-weight:700;margin-bottom:5px">Suggested marking points</div><ul style="margin:0 0 9px 16px;padding:0">${pts}</ul>
+      <div class="row-flex"><span style="font-weight:600">Honest marks /${q.m}:</span><input type="number" min="0" max="${q.m}" step="1" class="selfmark" data-i="${idx}" style="width:80px"></div>`;
+    card.appendChild(div);
+  });
+  $("#exFoot").innerHTML=`<span class="modenote">Mark yourself honestly — the gauge only means something if you do</span><button class="btn teal" id="exFinish">Record result</button>`;
+  $("#exFinish").onclick=()=>{
+    let got=0; results.forEach((r,idx)=>{ if(r.type==="mcq")got+=r.got; });
+    let ok=true;
+    b.querySelectorAll(".selfmark").forEach(inp=>{const idx=+inp.dataset.i;const v=inp.value===""?null:Math.max(0,Math.min(results[idx].max,+inp.value));if(v===null){ok=false;}results[idx].got=v||0;got+=v||0;});
+    if(!ok){toast("Enter a self-mark for each written answer");return;}
+    finishTest(results,got,totalMax);
+  };
+}
+function finishTest(results,got,totalMax){
+  const pct=Math.round(got/totalMax*100);
+  const k=EX.k,i=EX.i, sp=SUBJECTS[k], ch=sp.chapters[i], st=cstate(k,i);
+  // update state
+  st.learned=true; st.score=pct; st.conf=EX.conf; st.tested=todayStr(); st.attempts=(st.attempts||0)+1;
+  const passed=pct>=PASS;
+  st.mastered=passed?true:st.mastered; // once mastered stays unless future fail? keep mastered if passed
+  if(!passed) st.mastered=false;
+  st.next=addDays(todayStr(),SPACING[Math.min(st.attempts, passed?SPACING.length-1:0)]||(passed?21:2));
+  if(!passed) st.next=addDays(todayStr(),2);
+  saveState();
+  // render results + verdict
+  const b=$("#exBody"); b.innerHTML="";
+  const wrongForLeech=[];
+  results.forEach((r,idx)=>{
+    const q=EX.questions[idx];
+    const card=document.createElement("div"); card.className="qcard";
+    let inner=`<div class="qh"><span class="qn">Q${idx+1}</span><span class="qm">${r.got}/${r.max}</span></div><div class="qtext">${escapeHtml(q.q)}</div>`;
+    if(r.type==="mcq"&&q.o){
+      inner+=`<div>`+q.o.map((o,oi)=>{let cls="opt";if(oi===r.c)cls+=" correct";if(oi===r.sel&&oi!==r.c)cls+=" wrong";return `<div class="${cls}"><span class="ol">${String.fromCharCode(65+oi)}</span><span>${escapeHtml(o)}</span></div>`;}).join("")+`</div>`;
+      if(r.correct){ inner+=`<div class="fb good"><span class="pts">Correct.</span> ${escapeHtml(r.e||"")}</div>`; }
+      else {
+        const ca=q.o[r.c]!=null?String.fromCharCode(65+r.c)+". "+q.o[r.c]:"";
+        const yours=(r.sel!=null&&q.o[r.sel]!=null)?String.fromCharCode(65+r.sel)+". "+q.o[r.sel]:"(left blank)";
+        inner+=`<div class="fb bad"><div><span class="pts">Wrong.</span> You chose <b>${escapeHtml(yours)}</b>.</div>
+          <div style="margin-top:6px"><b>Correct answer:</b> ${escapeHtml(ca)}</div>
+          <div style="margin-top:4px"><b>Why:</b> ${escapeHtml(r.e||"see the correct option above")}</div></div>`;
+        wrongForLeech.push(q.q.slice(0,90));
+      }
+    } else {
+      const weak=r.got<r.max*0.7;
+      const cls=r.got>=r.max*0.7?"good":r.got>=r.max*0.4?"mid":"bad";
+      inner+=`<div class="fb ${cls}"><span class="pts">${r.got}/${r.max}.</span> ${escapeHtml(r.f||(r.self?"Self-marked.":""))}</div>`;
+      if(weak){
+        if(r.w) inner+=`<div class="fb bad" style="margin-top:7px"><b>Where you went wrong:</b> ${escapeHtml(r.w)}</div>`;
+        if(r.a) inner+=`<div class="fb good" style="margin-top:7px"><b>Model answer (this is what the examiner wanted):</b><br>${escapeHtml(r.a).replace(/\n/g,"<br>")}</div>`;
+        else if(r.self&&(r.p&&r.p.length)) inner+=`<div class="fb mid" style="margin-top:7px"><b>Reference — full marks needed:</b><ul style="margin:6px 0 0 16px;padding:0">${r.p.map(p=>`<li>${escapeHtml(p)}</li>`).join("")}</ul></div>`;
+        wrongForLeech.push(q.q.slice(0,90));
+      }
+    }
+    card.innerHTML=inner; b.appendChild(card);
+  });
+  // auto-feed mistakes into the Leech list (dedup)
+  if(wrongForLeech.length){
+    const tag=ch.n;
+    wrongForLeech.forEach(txt=>{
+      const t=tag+" — "+txt;
+      if(!S.leech.some(l=>l.text===t)) S.leech.push({id:Date.now()+""+Math.random().toFixed(3).slice(2),text:t,subj:k,date:todayStr(),done:false});
+    });
+    saveState(); renderLeech();
+  }
+  // verdict
+  const v=verdict(pct,ch.w,sp,EX.conf,passed);
+  const vd=document.createElement("div"); vd.className="verdict "+v.cls;
+  vd.innerHTML=`<div class="vscore">${pct}%</div><div class="vmsg">${v.msg}</div><div class="vnext">→ ${v.next}</div>`;
+  b.appendChild(vd);
+  $("#exFoot").innerHTML=`<span class="modenote">Result saved · next review ${st.next}</span><button class="btn teal" id="exDone">Close</button>`;
+  $("#exDone").onclick=()=>{closeExaminer();renderSubjects();drawGauge();renderToday();};
+  if(passed&&pct>=85)celebrate();
+}
+function verdict(pct,w,sp,conf,passed){
+  const high=w==="H"; const overconf=(conf>=4 && pct<conf*20-12);
+  let cls,msg,next;
+  if(pct>=85){cls="pass";msg=`<b>Rank-grade.</b> This is the level that turns 65 into a rank. ${high?"And it's a high-weightage chapter — exactly where toppers are airtight.":""}`;next="Lock it in. It returns for spaced re-test — keep it this sharp.";}
+  else if(pct>=70){cls="pass";msg=`Pass — but not yet a ranker's cushion${high?" on a <b>high-weightage</b> chapter":""}. A 70 here is a safe script, not a standout one.`;next="Re-attempt the 2 weakest questions this week and push past 85.";}
+  else if(passed){cls="weak";msg=`Bare pass. In May this is a <b>50–55 script</b>, not a rank script.${high? " On a high-weightage chapter that's marks you can't afford to leave on the table.":""}`;next="Re-study the gaps today; the app will re-test you in 48 hours. Don't move on satisfied.";}
+  else{cls="fail";msg=`<b>Fail. Not mastered.</b> ${pct}% means the concept isn't in your hands yet${high?", and this is a <b>high-weightage</b> chapter — that's roughly 6 marks currently exposed":""}. No softening it.`;next="Re-study from base material now. Forced re-test in 48 hours. You don't tick a new chapter until this clears 60%.";}
+  if(overconf){msg+=` <b>And note the gap:</b> you felt "${["","Shaky","Unsure","Okay","Solid","Bulletproof"][conf]}" but scored ${pct}%. That false confidence is the single most dangerous thing on this list — it's where ranks quietly slip.`;}
+  return {cls,msg,next};
+}
+function escapeHtml(s){return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+/* ============ FULL PAPER ============ */
+async function openFullPaper(k){
+  const sp=SUBJECTS[k];
+  $("#exTag").style.background=sp.color;$("#exTag").textContent=sp.name;
+  $("#exTitle").textContent="Full paper · "+sp.name;
+  $("#exSub").textContent=`ICAI pattern · 100 marks · ${sp.dur} min · 30 MCQ + 70 descriptive`;
+  $("#examModal").classList.add("show");
+  const b=$("#exBody");
+  b.innerHTML=`<div class="loading"><div class="spin"></div><div>Assembling a full ICAI-pattern paper…</div><div class="muted" style="margin-top:6px">Weightage-proportional across all chapters. This is the real test.</div></div>`;
+  $("#exFoot").innerHTML=`<span class="modenote">Building…</span>`;
+  let paper=null;
+  if(ENGINE!=="offline"){ try{ paper=await genFullPaper(k); setEngine("live"); }catch(e){ paper=null; } }
+  if(!paper){ return renderOfflinePaper(k); }
+  FP={k,paper,answers:{},started:Date.now(),dur:sp.dur};
+  renderFullPaper();
+}
+let FP=null;
+async function genFullPaper(k){
+  const sp=SUBJECTS[k];
+  const highs=sp.chapters.filter(c=>c.w==="H").map(c=>c.n).slice(0,6).join("; ");
+  const sys="You are an ICAI CA Final paper-setter and head examiner (new scheme). Set papers strictly to ICAI standard: exact 100-mark pattern, ICAI question style and language, current applicable provisions, and ICAI step-wise marking. Output ONLY minified JSON, no prose.";
+  // MCQ section: 15 x 2 = 30 marks, in 2 calls (8 + 7)
+  const mcq=[];
+  for(const batch of [8,7]){
+    const usr=`Set ${batch} ICAI-standard MCQs (2 marks each) for CA Final "${sp.full}", ICAI difficulty and phrasing, spread across the syllabus but weighted to high-weightage areas (${highs}). Some should be application/case-let based as ICAI does. Return JSON {"q":[{"q":"","o":["","","",""],"c":<0-3 correct index>,"e":"<1-line reason>"}]}. Concise.`;
+    try{const d=parseJSON(await callAI(sys,usr));(d.q||[]).forEach(x=>mcq.push({t:"mcq",m:2,q:x.q,o:x.o,c:x.c,e:x.e}));}catch(e){}
+  }
+  // descriptive section: 70 marks, ICAI pattern
+  let desc=[];
+  const usr2=`Set the 70-mark descriptive section of a CA Final "${sp.full}" paper to exact ICAI standard and style: ${sp.practical?"a mix of practical problems requiring full workings/working notes and short descriptive parts, exactly as ICAI sets":"structured descriptive questions that demand correct format, section/standard quoting, case-law/keywords as ICAI expects"}. Total EXACTLY 70 marks across 4-5 questions (use ICAI mark splits like 8/10/14), weighted to high-weightage chapters (${highs}). For each give the step-wise marking points an ICAI examiner would award against. Return JSON {"q":[{"t":"${sp.practical?"sum":"desc"}","m":<marks>,"q":"","p":["marking point / step 1","step 2","step 3"]}]}.`;
+  try{const d=parseJSON(await callAI(sys,usr2));desc=(d.q||[]).map(x=>({t:x.t||"desc",m:x.m||15,q:x.q,p:x.p||[]}));}catch(e){}
+  if(mcq.length<6 && desc.length<2) return null;
+  return {mcq,desc};
+}
+function renderFullPaper(){
+  const b=$("#exBody"); b.innerHTML="";
+  const {mcq,desc}=FP.paper;
+  b.insertAdjacentHTML("beforeend",`<div class="calm"><b>Exam conditions.</b> ${FP.dur} minutes. Part A: MCQs (${mcq.length*2} marks). Part B: descriptive (${desc.reduce((s,q)=>s+q.m,0)} marks). No pausing — this is the rehearsal.</div>`);
+  b.insertAdjacentHTML("beforeend",`<div class="muted" style="margin:-6px 0 12px">Set and graded to ICAI pattern and marking by the AI examiner — a rigorous practice paper, not ICAI's own evaluation. To check yourself against true ICAI standard, also sit a real past paper and mark it against ICAI's <a href="${ICAI_LINKS.ans}" target="_blank" rel="noopener">suggested answers</a>.</div>`);
+  let n=0;
+  mcq.forEach((q)=>{const idx=n++;b.appendChild(qCard(idx,q,"mcq"));});
+  desc.forEach((q)=>{const idx=n++;b.appendChild(qCard(idx,q,q.t));});
+  FP.flat=[...mcq,...desc];
+  b.querySelectorAll(".opt").forEach(o=>o.addEventListener("click",()=>{const qi=+o.dataset.q;b.querySelectorAll(`.opt[data-q="${qi}"]`).forEach(x=>x.classList.remove("sel"));o.classList.add("sel");FP.answers[qi]=+o.dataset.o;}));
+  $("#exTimer").style.display="block";
+  $("#exFoot").innerHTML=`<span class="modenote">Score feeds your readiness gauge directly</span><button class="btn" id="exCancel">Abandon</button><button class="btn teal" id="exSubmit">Submit paper</button>`;
+  $("#exCancel").onclick=()=>{clearInterval(FP.timer);closeExaminer();};
+  $("#exSubmit").onclick=submitFullPaper;
+  // timer
+  FP.timer=setInterval(()=>{const left=FP.dur*60-Math.floor((Date.now()-FP.started)/1000);const m=Math.floor(left/60),s=left%60;const t=$("#exTimer");t.textContent=`${m}:${String(s).padStart(2,"0")}`;t.classList.toggle("low",left<300);if(left<=0){clearInterval(FP.timer);toast("Time up — submitting");submitFullPaper();}},1000);
+}
+function qCard(idx,q,type){
+  const card=document.createElement("div");card.className="qcard";
+  const tl=type==="mcq"?"MCQ":type==="sum"?"Sum":"Descriptive";
+  let inner=`<div class="qh"><span class="qn">Q${idx+1}</span><span class="qtype ${type==="sum"?"sum":""}">${tl}</span><span class="qm">${q.m} marks</span></div><div class="qtext">${escapeHtml(q.q)}</div>`;
+  if(type==="mcq"&&q.o){inner+=q.o.map((o,oi)=>`<div class="opt" data-q="${idx}" data-o="${oi}"><span class="ol">${String.fromCharCode(65+oi)}</span><span>${escapeHtml(o)}</span></div>`).join("");}
+  else{inner+=`<textarea data-ans="${idx}" placeholder="Answer / workings…"></textarea>`;}
+  card.innerHTML=inner;return card;
+}
+async function submitFullPaper(){
+  clearInterval(FP.timer);
+  const b=$("#exBody");
+  b.querySelectorAll("textarea[data-ans]").forEach(t=>{FP.answers["t"+t.dataset.ans]=t.value.trim();});
+  let max=0,got=0;const evalItems=[],evalMap=[],res=[];
+  FP.flat.forEach((q,idx)=>{max+=q.m;
+    if(q.t==="mcq"||q.o){const correct=FP.answers[idx]===q.c;const g=correct?q.m:0;got+=g;res[idx]={mcq:true,got:g,max:q.m,correct};}
+    else{evalItems.push({q:q.q,m:q.m,p:q.p||[],ans:FP.answers["t"+idx]||"(blank)"});evalMap.push(idx);res[idx]={max:q.m};}
+  });
+  if(evalItems.length && ENGINE==="live"){
+    b.innerHTML=`<div class="loading"><div class="spin"></div><div>Examiner is marking your paper…</div></div>`;
+    // evaluate descriptive in up to 2 chunks
+    try{
+      for(let off=0;off<evalItems.length;off+=3){
+        const chunk=evalItems.slice(off,off+3);
+        const r=await evalAnswers(FP.k,0,chunk);
+        r.forEach((rr,n)=>{const idx=evalMap[off+n];const g=Math.max(0,Math.min(res[idx].max,+rr.s||0));res[idx].got=g;res[idx].f=rr.f||"";res[idx].a=rr.a||"";res[idx].w=rr.w||"";got+=g;});
+      }
+    }catch(e){evalMap.forEach(idx=>{if(res[idx].got==null){res[idx].got=Math.round(res[idx].max*0.5);res[idx].f="Could not auto-grade — self-review.";got+=res[idx].got;}});}
+  } else {
+    evalMap.forEach(idx=>{res[idx].got=Math.round(res[idx].max*0.5);res[idx].self=true;});
+  }
+  const pct=Math.round(got/max*100);
+  S.subjects[FP.k].paper={score:pct,date:todayStr(),got,max};
+  saveState();
+  // verdict
+  const sp=SUBJECTS[FP.k], tgt=S.targets[FP.k];
+  let cls,msg,next;
+  if(pct>=tgt+5){cls="pass";msg=`<b>${pct}/100 — above your ${tgt} target.</b> This is what a rank-bound full paper looks like. The whole-syllabus performance, under time, is the truest signal there is.`;next="Bank it. Re-sit a fresh full paper in 3 weeks to confirm it wasn't a one-off.";}
+  else if(pct>=tgt-5){cls="weak";msg=`${pct}/100 — around your ${tgt} target but no cushion. A rank needs you <i>comfortably</i> past target across all six, not scraping it.`;next="Identify the 3 questions that bled marks → Leech list → re-test those chapters, then re-sit.";}
+  else{cls="fail";msg=`<b>${pct}/100 — below your ${tgt} target.</b> Chapter-by-chapter passes mean little if the full paper doesn't hold up under time. This is the honest verdict: not rank-ready yet.`;next="Treat every sub-70% answer as a fresh weak area. Re-test those chapters this week and re-sit this paper.";}
+  b.innerHTML=`<div class="verdict ${cls}"><div class="vscore">${pct}/100</div><div class="vmsg">${msg}</div><div class="vnext">→ ${next}</div></div>
+    <div class="muted" style="margin:12px 0 8px">Per-question review — model answers shown where you lost marks. Every weak area below has been added to your Leech list.</div>`;
+  const wrongForLeech=[];
+  FP.flat.forEach((q,idx)=>{
+    const r=res[idx]; const isMcq=(q.t==="mcq"||q.o);
+    const card=document.createElement("div"); card.className="qcard";
+    let inner=`<div class="qh"><span class="qn">Q${idx+1}</span><span class="qm">${r.got}/${r.max}</span></div><div class="qtext">${escapeHtml(q.q)}</div>`;
+    if(isMcq){
+      if(r.correct){inner+=`<div class="fb good"><span class="pts">Correct.</span> ${escapeHtml(q.e||"")}</div>`;}
+      else{const ca=q.o&&q.o[q.c]!=null?String.fromCharCode(65+q.c)+". "+q.o[q.c]:"";const yours=(FP.answers[idx]!=null&&q.o&&q.o[FP.answers[idx]]!=null)?String.fromCharCode(65+FP.answers[idx])+". "+q.o[FP.answers[idx]]:"(blank)";
+        inner+=`<div class="fb bad"><div><span class="pts">Wrong.</span> You chose <b>${escapeHtml(yours)}</b>.</div><div style="margin-top:6px"><b>Correct answer:</b> ${escapeHtml(ca)}</div><div style="margin-top:4px"><b>Why:</b> ${escapeHtml(q.e||"see correct option")}</div></div>`;
+        wrongForLeech.push(q.q.slice(0,90));}
+    } else {
+      const weak=r.got<r.max*0.7; const fc=r.got>=r.max*0.7?"good":r.got>=r.max*0.4?"mid":"bad";
+      inner+=`<div class="fb ${fc}"><span class="pts">${r.got}/${r.max}.</span> ${escapeHtml(r.f||(r.self?"Self-review against ICAI suggested answer.":""))}</div>`;
+      if(weak){
+        if(r.w) inner+=`<div class="fb bad" style="margin-top:7px"><b>Where you went wrong:</b> ${escapeHtml(r.w)}</div>`;
+        if(r.a) inner+=`<div class="fb good" style="margin-top:7px"><b>Model answer:</b><br>${escapeHtml(r.a).replace(/\n/g,"<br>")}</div>`;
+        else if(q.p&&q.p.length) inner+=`<div class="fb mid" style="margin-top:7px"><b>Marking points:</b><ul style="margin:6px 0 0 16px;padding:0">${q.p.map(p=>`<li>${escapeHtml(p)}</li>`).join("")}</ul></div>`;
+        wrongForLeech.push(q.q.slice(0,90));
+      }
+    }
+    card.innerHTML=inner; b.appendChild(card);
+  });
+  if(wrongForLeech.length){const tag=sp.name+" full paper";wrongForLeech.forEach(txt=>{const t=tag+" — "+txt;if(!S.leech.some(l=>l.text===t))S.leech.push({id:Date.now()+""+Math.random().toFixed(3).slice(2),text:t,subj:FP.k,date:todayStr(),done:false});});saveState();}
+  $("#exTimer").style.display="none";
+  $("#exFoot").innerHTML=`<span class="modenote">Saved to readiness</span><button class="btn teal" id="exDone">Close</button>`;
+  $("#exDone").onclick=()=>{closeExaminer();renderSubjects();drawGauge();renderToday();renderMocks();renderLeech();};
+  if(pct>=tgt+5)celebrate();
+}
+function renderOfflinePaper(k){
+  const sp=SUBJECTS[k];
+  $("#exBody").innerHTML=`<div class="calm">Offline mode — the most authentic full paper is a <b>real ICAI past paper</b>. Open one from the Papers Vault, sit it under timed exam conditions (${sp.dur} min), self-mark against the suggested answers, then record your score below.</div>
+    <div class="field"><label>Your honest score out of 100</label><input type="number" id="ofScore" min="0" max="100" step="1"></div>`;
+  $("#exFoot").innerHTML=`<button class="btn" id="exCancel">Cancel</button><button class="btn teal" id="exSave">Record score</button>`;
+  $("#exCancel").onclick=closeExaminer;
+  $("#exSave").onclick=()=>{const v=+$("#ofScore").value;if(!v&&v!==0){toast("Enter a score");return;}S.subjects[k].paper={score:v,date:todayStr(),got:v,max:100,self:true};saveState();closeExaminer();renderSubjects();drawGauge();renderToday();toast("Full-paper score recorded");};
+}
+
+/* ============ READINESS / PROJECTION ============ */
+function subjQuality(k){const st=S.subjects[k];const sc=st.chapters.filter(c=>c.score!=null).map(c=>c.score);return sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null;}
+function masteredPct(k){const st=S.subjects[k];return st.chapters.filter(c=>c.mastered).length/st.chapters.length;}
+function projMark(k){
+  const st=S.subjects[k];
+  if(st.paper&&st.paper.score!=null) return st.paper.score;
+  const ms=S.mocks.filter(m=>m.subj===k); if(ms.length){const l=ms.slice(-2);return Math.round(l.reduce((s,m)=>s+m.total,0)/l.length);}
+  const q=subjQuality(k); if(q==null) return null;
+  return Math.round(q*(0.4+0.6*masteredPct(k)));
+}
+function projection(){let tot=0,have=0;for(const k of ORDER){const p=projMark(k);if(p!=null){tot+=p;have++;}}return{total:Math.round(tot),have};}
+function marksAtRisk(){let n=0;for(const k of ORDER){SUBJECTS[k].chapters.forEach((c,i)=>{if(c.w==="H"&&!cstate(k,i).mastered)n++;});}return{count:n,marks:n*6};}
+
+function drawGauge(){
+  const {total,have}=projection();
+  const g=$("#gauge");const cx=75,cy=78,r=58,sw=13,a0=-220,a1=40,max=600;
+  const pt=(ang,rad)=>{const a=ang*Math.PI/180;return[cx+rad*Math.cos(a),cy+rad*Math.sin(a)];};
+  const arc=(f,t,rad)=>{const[a,b]=pt(f,rad),[c,d]=pt(t,rad);const lg=(t-f)>180?1:0;return`M${a},${b} A${rad},${rad} 0 ${lg} 1 ${c},${d}`;};
+  const frac=Math.max(0,Math.min(1,total/max));const va=a0+(a1-a0)*frac;
+  const bLo=a0+(a1-a0)*(404/max),bHi=a0+(a1-a0)*(419/max);
+  g.innerHTML=`<path d="${arc(a0,a1,r)}" stroke="#ECE6DA" stroke-width="${sw}" fill="none" stroke-linecap="round"/>
+   <path d="${arc(bLo,bHi,r)}" stroke="#BE8A2C" stroke-width="${sw+3}" fill="none"/>
+   ${have?`<path d="${arc(a0,va,r)}" stroke="url(#gg)" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`:""}
+   <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E7C66"/><stop offset="1" stop-color="#1ba888"/></linearGradient></defs>
+   <text x="${cx}" y="${cy+30}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#8A91A1">AIR 48</text>`;
+  $("#projMarks").textContent=have?total:"—";
+  const pill=$("#bandPill");
+  if(!have){pill.className="pill on";pill.textContent="Start testing to project";}
+  else if(have<6){pill.className="pill below";pill.textContent=`Partial · only ${have}/6 subjects tested`;}
+  else if(total>=404){pill.className="pill on";pill.textContent=`On track · +${total-404} into the band`;}
+  else{pill.className="pill below";pill.textContent=`${404-total} below the band`;}
+  const risk=marksAtRisk();
+  $("#riskLine").innerHTML=risk.count?`Marks at risk: <b>≈ ${risk.marks}</b> — ${risk.count} high-weightage chapters still untested/unmastered. Toppers don't leave these exposed.`:`No high-weightage chapter left untested. That's rank discipline. ✓`;
+}
+
+/* ============ RANK PULSE BRIEFINGS ============ */
+function briefings(){
+  const out=[];const d=todayStr();
+  // off-pace check
+  let totalCh=0,mastered=0;for(const k of ORDER){totalCh+=SUBJECTS[k].chapters.length;mastered+=S.subjects[k].chapters.filter(c=>c.mastered).length;}
+  const daysToAttempt=Math.max(1,daysBetween(d,ATTEMPT));
+  const remaining=totalCh-mastered;
+  const needPerWeek=(remaining/daysToAttempt*7);
+  if(remaining>0){
+    out.push({ic:"📌",cls:"",t:`${mastered}/${totalCh} chapters mastered. To finish in time you must master ≈ <b>${needPerWeek.toFixed(1)}/week</b> from here — and that's before revision rounds.`});
+  }
+  // weakest tested high chapter
+  let worst=null;for(const k of ORDER){SUBJECTS[k].chapters.forEach((c,i)=>{const st=cstate(k,i);if(c.w==="H"&&st.score!=null&&st.score<70){if(!worst||st.score<worst.s)worst={k,n:c.n,s:st.score};}});}
+  if(worst)out.push({ic:"🩸",cls:"bad",t:`<b>${SUBJECTS[worst.k].name} — ${worst.n}</b> scored ${worst.s}% and is high-weightage. That's a guaranteed bleed of marks. Re-study and re-test it this week.`});
+  // overconfidence
+  let oc=null;for(const k of ORDER){SUBJECTS[k].chapters.forEach((c,i)=>{const st=cstate(k,i);if(st.conf>=4&&st.score!=null&&st.score<st.conf*20-12){if(!oc)oc={k,n:c.n};}});}
+  if(oc)out.push({ic:"⚠️",cls:"bad",t:`You felt strong on <b>${oc.n}</b> but the score said otherwise. False confidence is the quiet rank-killer — trust tested scores, not feelings.`});
+  // full paper nudges
+  for(const k of ORDER){const allM=S.subjects[k].chapters.every(c=>c.mastered)&&S.subjects[k].round>=1;if(allM&&!S.subjects[k].paper){out.push({ic:"📝",cls:"",t:`<b>${SUBJECTS[k].name}</b> is fully mastered and revised — sit its full 100-mark paper. Chapter passes mean nothing until the whole paper holds under time.`});}}
+  // marks at risk
+  const risk=marksAtRisk();
+  if(risk.count>3)out.push({ic:"🎯",cls:"bad",t:`≈ <b>${risk.marks} marks</b> sit in untested high-weightage chapters. Clear the "Prove it" list — that's the cheapest distance to the band.`});
+  // positive
+  const {total,have}=projection();
+  if(have>=3&&total>=404)out.push({ic:"🔥",cls:"good",t:`Your proven projection is <b>${total}</b> — inside the AIR-48 band. Hold the discipline; don't coast.`});
+  if(!out.length)out.push({ic:"🚀",cls:"good",t:`Clean slate. Open a subject, study a chapter, then tick it — and the examiner will test whether you truly know it.`});
+  return out.slice(0,4);
+}
+
+/* ============ DAILY PLAN ============ */
+function nextUntested(k,wantHigh){const cs=SUBJECTS[k].chapters,st=S.subjects[k].chapters;let idx=-1;if(wantHigh)idx=cs.findIndex((c,i)=>c.w==="H"&&!st[i].mastered);if(idx<0)idx=cs.findIndex((c,i)=>c.w==="M"&&!st[i].mastered);if(idx<0)idx=st.findIndex(s=>!s.mastered);return idx<0?null:{i:idx,name:cs[idx].n,w:cs[idx].w};}
+function genPlan(d){
+  const date=new Date(d),dow=date.getDay(),dayIdx=Math.floor(new Date(d)/86400000);const tasks=[];
+  if(inPhase1(d)){
+    const lec=(dayIdx%2===0)?"GST":"DT";const lc=nextUntested(lec,true);
+    tasks.push({id:d+"-l",lab:`New learning · ${SUBJECTS[lec].name} lecture + notes`,hrs:2,hint:lc?`Then tick "${lc.name}" to be tested on it`:"First pass nearly done — switch to problems",w:lc?lc.w:null});
+    const pool=["FR","AFM","Audit",(lec==="GST"?"DT":"GST"),"IBS"];const rev=pool[dayIdx%pool.length];const rc=nextUntested(rev,true);
+    tasks.push({id:d+"-r",lab:`Revision · ${SUBJECTS[rev].name}`,hrs:2,hint:rc?`High-yield: ${rc.name} — get it to mastered`:"Covered — do a recall test",w:rc?rc.w:null});
+    return{phase:1,title:"Phase 1 · Foundation + first revision",meta:"4 hrs — 2 hrs new learning, 2 hrs revision. Every chapter you finish, get it tested to 'mastered'.",tasks,target:4,light:false};
+  }
+  const taper=daysBetween(d,ATTEMPT)<=49;const pri=[...ORDER].sort((a,b)=>score(b)-score(a));
+  if(dow===0){tasks.push({id:d+"-a",lab:`Light recall · ${SUBJECTS[pri[0]].name}`,hrs:3,hint:"Flashcards / active recall only.",});tasks.push({id:d+"-b",lab:`Leech-list drill`,hrs:2,hint:"Clear 3-4 weak spots, then truly rest."});tasks.push({id:d+"-rest",lab:`Rest & reset (non-negotiable)`,hrs:0,hint:"This protects April."});return{phase:2,title:"Lighter day · protect the long run",meta:"~5 hrs by design.",tasks,target:5,light:true};}
+  if(taper){tasks.push({id:d+"-m",lab:`Full mock — ${SUBJECTS[pri[0]].name} (timed)`,hrs:3.5,hint:"Exam conditions. Then log it.",});tasks.push({id:d+"-ev",lab:`Evaluate + every mistake → Leech list`,hrs:1.5,hint:""});tasks.push({id:d+"-r1",lab:`Final revision · ${SUBJECTS[pri[1]].name}`,hrs:3,hint:hintFor(pri[1])});tasks.push({id:d+"-r2",lab:`Final revision · ${SUBJECTS[pri[2]].name}`,hrs:3,hint:hintFor(pri[2])});tasks.push({id:d+"-le",lab:`Leech-list sweep`,hrs:2,hint:""});return{phase:2,title:"Final stretch · mocks + targeted revision",meta:"~13 hrs. Mistakes drive what you revise.",tasks,target:13,light:false};}
+  tasks.push({id:d+"-1",lab:`Deep revision · ${SUBJECTS[pri[0]].name}`,hrs:3.5,hint:hintFor(pri[0])});
+  tasks.push({id:d+"-2",lab:`Deep revision · ${SUBJECTS[pri[1]].name}`,hrs:3,hint:hintFor(pri[1])});
+  tasks.push({id:d+"-3",lab:`Practice problems · ${SUBJECTS[pri[2]].name}`,hrs:3,hint:hintFor(pri[2])});
+  tasks.push({id:d+"-4",lab:`Theory recall · ${SUBJECTS[pri[3]].name}`,hrs:2,hint:hintFor(pri[3])});
+  tasks.push({id:d+"-5",lab:`Past paper / MTP set (timed)`,hrs:2,hint:"From the Papers vault."});
+  return{phase:2,title:"Phase 2 · Intensive revision",meta:"~13.5 hrs · Pomodoro 50/10.",tasks,target:13.5,light:false};
+}
+function hintFor(k){const c=nextUntested(k,true);return c?`Start high-weightage: ${c.name}`:"All mastered — switch to recall + papers";}
+function score(k){const sp=SUBJECTS[k],st=S.subjects[k];const revLeft=sp.targetRev-st.round;let hi=0,hd=0;sp.chapters.forEach((c,i)=>{if(c.w==="H"){hi++;if(st.chapters[i].mastered)hd++;}});const gap=hi?(1-hd/hi):0;return revLeft*10+gap*8+(sp.role==="strong"?2:0);}
+
+/* ============ RENDER: TODAY ============ */
+let curPlan=null;
+function renderToday(){
+  const d=todayStr(),dd=day(d),plan=genPlan(d);curPlan=plan;
+  // pulse
+  const pc=$("#pulseCard");pc.innerHTML=`<h3>📡 Rank pulse <span class="muted" style="font-weight:500;font-size:11.5px">— the blunt read on where you stand</span></h3>`+briefings().map(b=>`<div class="pulse-item ${b.cls}"><span class="ic">${b.ic}</span><span>${b.t}</span></div>`).join("");
+  $("#todayDateNote").textContent=new Date(d).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  // re-tests due
+  const due=[];for(const k of ORDER){SUBJECTS[k].chapters.forEach((c,i)=>{const st=cstate(k,i);if(st.mastered&&st.next&&st.next<=d)due.push({k,i,n:c.n});});}
+  const rw=$("#retestWrap");
+  if(due.length){rw.innerHTML=`<div class="card task-card" style="margin-bottom:16px;border-left:4px solid var(--gold)"><h3 style="font-size:14px;margin:0 0 8px">⏳ Due for re-test — spaced revision (${due.length})</h3>`+due.slice(0,5).map(x=>`<div class="retest"><div><div class="nm">${x.n}</div><div class="sub">${SUBJECTS[x.k].name}</div></div><button class="btn tiny teal" data-rt="${x.k}:${x.i}">Re-test</button></div>`).join("")+(due.length>5?`<div class="muted">+${due.length-5} more due</div>`:"")+`</div>`;
+    rw.querySelectorAll("[data-rt]").forEach(b=>b.addEventListener("click",()=>{const[k,i]=b.dataset.rt.split(":");openExaminer(k,+i);}));
+  } else rw.innerHTML="";
+  $("#planTitle").textContent=plan.title;$("#planMeta").textContent=plan.meta;
+  const tl=$("#taskList");tl.innerHTML="";
+  plan.tasks.forEach(t=>{const done=dd.done.includes(t.id);const el=document.createElement("div");el.className="task"+(done?" done":"");
+    el.innerHTML=`<div class="chk">${done?"✓":""}</div><div class="body"><div class="lab">${t.lab}</div><div class="hint">${t.hint||""}</div></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${t.hrs?`<span class="hrs">${t.hrs} h</span>`:`<span class="hrs">rest</span>`}${t.w?`<span class="wtag ${t.w}">${t.w==="H"?"high":t.w==="M"?"med":"low"}</span>`:""}</div>`;
+    el.querySelector(".chk").addEventListener("click",()=>{const i=dd.done.indexOf(t.id);if(i<0)dd.done.push(t.id);else dd.done.splice(i,1);saveState();renderToday();if(plan.tasks.filter(x=>x.hrs>0).every(x=>dd.done.includes(x.id))){celebrate();toast("Day complete — that's how rank is built 🔥");}});
+    tl.appendChild(el);});
+  $("#hoursIn").value=dd.hours||"";$("#hoursTarget").textContent=`target ≈ ${plan.target} h`+(plan.light?" · lighter day":"");
+  $$("#energyRow .emoji-btn").forEach(b=>b.classList.toggle("sel",+b.dataset.energy===dd.energy));
+  renderFocus();
+  if(dd.bad)enterBadDay();
+}
+function renderFocus(){
+  const fl=$("#focusList");fl.innerHTML="";const items=[];
+  for(const k of ORDER){SUBJECTS[k].chapters.forEach((c,i)=>{if(c.w==="H"&&!cstate(k,i).mastered)items.push({k,i,n:c.n});});}
+  if(!items.length){fl.innerHTML=`<div class="muted">Every high-weightage chapter is mastered. Outstanding. 🎯</div>`;return;}
+  items.slice(0,6).forEach(it=>{const st=cstate(it.k,it.i);const el=document.createElement("div");el.className="task";el.style.padding="9px 11px";el.style.marginBottom="7px";
+    el.innerHTML=`<div class="body"><div class="lab" style="font-size:13px">${it.n}</div><div class="hint">${SUBJECTS[it.k].name}${st.score!=null?` · last ${st.score}%`:""}</div></div><button class="btn tiny teal" style="flex:none">Test me</button>`;
+    el.querySelector("button").addEventListener("click",()=>openExaminer(it.k,it.i));fl.appendChild(el);});
+  if(items.length>6)fl.insertAdjacentHTML("beforeend",`<div class="muted" style="margin-top:6px">+ ${items.length-6} more high-weightage chapters untested</div>`);
+}
+function celebrate(){const c=document.createElement("canvas");c.className="confetti";c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);const x=c.getContext("2d");const cols=["#0E7C66","#BE8A2C","#1ba888","#D1544C","#1C6FB0"];let P=Array.from({length:90},()=>({x:Math.random()*c.width,y:-20,vy:2+Math.random()*4,vx:-2+Math.random()*4,s:4+Math.random()*5,col:cols[Math.floor(Math.random()*cols.length)],r:Math.random()*6}));let f=0;(function loop(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.y+=p.vy;p.x+=p.vx;p.r+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.col;x.fillRect(-p.s/2,-p.s/2,p.s,p.s);x.restore();});f++;if(f<90)requestAnimationFrame(loop);else c.remove();})();}
+
+/* ============ RENDER: SUBJECTS ============ */
+let filterMode={};
+function renderSubjects(){
+  const wrap=$("#subjList");wrap.innerHTML="";const d=todayStr();
+  for(const k of ORDER){
+    const sp=SUBJECTS[k],st=S.subjects[k],total=sp.chapters.length;
+    const mastered=st.chapters.filter(c=>c.mastered).length,learned=st.chapters.filter(c=>c.learned&&!c.mastered).length;
+    const pct=Math.round(mastered/total*100);
+    let hi=0,hd=0;sp.chapters.forEach((c,i)=>{if(c.w==="H"){hi++;if(st.chapters[i].mastered)hd++;}});
+    const hiPct=hi?Math.round(hd/hi*100):100;const open=st._open;
+    const el=document.createElement("div");el.className="subj"+(open?" open":"");
+    let rounds="";for(let r=1;r<=sp.targetRev;r++)rounds+=`<div class="rdot ${r<=st.round?"full":""}">${r}</div>`;
+    const paperReady=st.chapters.every(c=>c.mastered)&&st.round>=1;
+    el.innerHTML=`<div class="subj-head"><div class="subj-tag" style="background:${sp.color}">${sp.name}</div>
+      <div class="subj-info"><div class="nm">${sp.full} ${sp.role==="strong"?'<span class="role strong" style="margin-left:4px">scoring</span>':''}</div>
+      <div class="full">Group ${sp.group} · ${total} chapters · ${st.paper?("full paper "+st.paper.score+"/100"):"no full paper yet"}</div>
+      <div class="bar" style="margin-top:7px;max-width:280px"><i style="width:${pct}%"></i></div></div>
+      <div class="subj-stats"><div class="statlet"><div class="n">${pct}%</div><div class="l">mastered</div></div>
+      <div class="statlet"><div class="n" style="color:${hiPct<100?'var(--high)':'var(--teal-deep)'}">${hiPct}%</div><div class="l">high-wt</div></div>
+      <div class="rounds">${rounds}</div><span class="caret">▶</span></div></div><div class="subj-body"></div>`;
+    el.querySelector(".subj-head").addEventListener("click",()=>{st._open=!st._open;renderSubjects();});
+    if(open){
+      const body=el.querySelector(".subj-body");const fm=filterMode[k]||"all";
+      body.innerHTML=`<div class="subj-toolbar"><div class="rev-ctrl"><span class="muted" style="font-weight:600">Revision round</span>
+        <button class="btn tiny" data-act="rminus">–</button><span class="mono" style="font-weight:600;min-width:18px;text-align:center">R${st.round}</span>
+        <button class="btn tiny" data-act="rplus">+</button><span class="muted">/ ${sp.targetRev}</span></div><div class="grow"></div>
+        <button class="chip ${fm==='all'?'on':''}" data-f="all">All</button><button class="chip ${fm==='H'?'on':''}" data-f="H">High only</button>
+        <button class="chip ${fm==='todo'?'on':''}" data-f="todo">Not mastered</button></div><div class="chaps"></div>
+        <div class="paper-row ${paperReady?'ready':''}"><span class="pt">${paperReady?'<b>Unlocked:</b> all chapters mastered + revised. Sit the full 100-mark ICAI-pattern paper.':'Full 100-mark paper unlocks when every chapter is mastered <b>and</b> you log at least one revision round.'}</span>
+        <button class="btn ${paperReady?'teal':''}" id="fp-${k}" ${paperReady?'':'disabled'}>${st.paper?'Re-sit paper':'Take full paper'}</button></div>`;
+      const cc=body.querySelector(".chaps");
+      sp.chapters.forEach((c,i)=>{const cs=cstate(k,i);if(fm==="H"&&c.w!=="H")return;if(fm==="todo"&&cs.mastered)return;
+        const due=cs.mastered&&cs.next&&cs.next<=d;
+        const stClass=cs.mastered?"mastered":cs.learned?"learned":"";
+        let badge;if(cs.score==null)badge=`<span class="scoreb none">untested</span>`;else{const cl=cs.score>=70?"good":cs.score>=PASS?"mid":"bad";badge=`<span class="scoreb ${cl}">${cs.score}%</span>`;}
+        const ce=document.createElement("div");ce.className="chap "+c.w+(cs.mastered?" mastered":"")+(due?" due":"");
+        ce.innerHTML=`<div class="statedot ${stClass}" title="${cs.mastered?'mastered':cs.learned?'studied':'untouched'}"></div><span class="wdot ${c.w}"></span><span class="ctxt">${c.n}</span>${badge}<button class="stbtn test">${cs.mastered?(due?"Re-test (due)":"Re-test"):"Study done → test me"}</button>`;
+        ce.querySelector(".stbtn").addEventListener("click",()=>openExaminer(k,i));
+        cc.appendChild(ce);});
+      body.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{filterMode[k]=b.dataset.f;renderSubjects();}));
+      body.querySelector('[data-act=rplus]').addEventListener("click",()=>{if(st.round<sp.targetRev){st.round++;saveState();renderSubjects();if(st.round===sp.targetRev){celebrate();toast(`${sp.name}: ${sp.targetRev} revisions done ✓`);}}});
+      body.querySelector('[data-act=rminus]').addEventListener("click",()=>{if(st.round>0){st.round--;saveState();renderSubjects();}});
+      const fpb=body.querySelector("#fp-"+k);if(fpb&&paperReady)fpb.addEventListener("click",()=>openFullPaper(k));
+    }
+    wrap.appendChild(el);
+  }
+  $("#weightNote").innerHTML=`Weightage tags are trend-based estimates — verify against ICAI's skill-weightage on the <a href="https://boslive.icai.org/" target="_blank" rel="noopener">BoS Knowledge Portal</a>. A chapter only counts as <b>mastered</b> (and toward your readiness) once you pass its test — ticking alone proves nothing.`;
+}
+
+/* ============ MARKS / MOCKS / VAULT / LEECH / WELL ============ */
+function renderMarks(){const g=$("#marksGrid");g.innerHTML="";for(const k of ORDER){const sp=SUBJECTS[k],v=S.targets[k];const row=document.createElement("div");row.className="mrow";
+  row.innerHTML=`<span class="nm">${sp.name}</span><span class="role ${sp.role==='strong'?'strong':'sec'}">${sp.role==='strong'?'scoring':'secondary'}</span><span class="track"><input type="range" min="40" max="90" value="${v}" data-k="${k}"></span><span class="val mono" id="mval-${k}">${v}</span>`;
+  row.querySelector("input").addEventListener("input",e=>{S.targets[k]=+e.target.value;$("#mval-"+k).textContent=e.target.value;saveState();updateMarksTotals();drawGauge();});g.appendChild(row);}updateMarksTotals();}
+function updateMarksTotals(){let tot=0;for(const k of ORDER)tot+=S.targets[k];$("#marksTotal").textContent=tot;const st=$("#marksStatus");
+  if(tot>=404&&tot<=419){st.style.color="var(--teal-deep)";st.textContent="✓ In the AIR-48 band (404–419)";}else if(tot<404){st.style.color="var(--high)";st.textContent=`${404-tot} short of the band`;}else{st.style.color="var(--gold)";st.textContent=`${tot-419} above the band — buffer`;}
+  const strong=ORDER.filter(k=>SUBJECTS[k].role==="strong");const sSum=strong.reduce((s,k)=>s+S.targets[k],0);
+  $("#carryNote").innerHTML=`Your scoring trio <b>${strong.map(k=>SUBJECTS[k].name).join(" · ")}</b> is planned to bring <b>${sSum}</b> of ${tot} (${Math.round(sSum/tot*100)}%). If one slips, the other two — and your buffer above 404 — protect the rank.`;}
+function renderMocks(){const wrap=$("#mockBySubject");wrap.innerHTML="";for(const k of ORDER){const ms=S.mocks.filter(m=>m.subj===k);const card=document.createElement("div");card.className="card mock-log";card.style.marginBottom="14px";const tgt=S.targets[k];
+  const paper=S.subjects[k].paper;
+  let rows=ms.map(m=>{const good=m.total>=tgt;return `<tr><td class="mono">${new Date(m.date).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</td><td class="mono">${m.content}/70</td><td class="mono">${m.pres}/30</td><td><span class="score-pill ${good?'good':'bad'}">${m.total}/100</span></td><td class="mono muted">${m.time||"—"}m</td><td><button class="btn ghost tiny" data-del="${m.id}">✕</button></td></tr>`;}).join("");
+  const avg=ms.length?Math.round(ms.reduce((s,m)=>s+m.total,0)/ms.length):null;
+  card.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div class="subj-tag" style="width:34px;height:34px;font-size:12px;background:${SUBJECTS[k].color}">${SUBJECTS[k].name}</div><div style="flex:1"><div style="font-weight:700">${SUBJECTS[k].full}</div><div class="muted">${ms.length} logged · target ${tgt}${avg!=null?` · avg ${avg}`:""}${paper?` · in-app full paper ${paper.score}/100`:""}</div></div>${avg!=null?`<span class="score-pill ${avg>=tgt?'good':'bad'}">${avg>=tgt?'on target':'below'}</span>`:""}<svg width="120" height="40" viewBox="0 0 120 40">${sparkPath(ms.map(m=>m.total),0,100,120,40,tgt)}</svg></div>${ms.length?`<table class="tbl"><thead><tr><th>Date</th><th>Content</th><th>Present.</th><th>Total</th><th>Time</th><th></th></tr></thead><tbody>${rows}</tbody></table>`:`<div class="muted">No external papers logged. In-app full papers appear once a subject is mastered.</div>`}`;
+  card.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{S.mocks=S.mocks.filter(m=>m.id!=b.dataset.del);saveState();renderMocks();drawGauge();}));wrap.appendChild(card);}}
+function sparkPath(vals,min,max,w,h,target){if(!vals.length)return`<line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="#E6E0D4" stroke-width="1.5"/>`;const n=vals.length;const xs=i=>n===1?w/2:i/(n-1)*(w-8)+4;const ys=v=>h-6-((v-min)/(max-min))*(h-12);const ty=ys(target);let d=vals.map((v,i)=>`${i?'L':'M'}${xs(i).toFixed(1)},${ys(v).toFixed(1)}`).join("");let dots=vals.map((v,i)=>`<circle cx="${xs(i).toFixed(1)}" cy="${ys(v).toFixed(1)}" r="2.5" fill="${v>=target?'#0E7C66':'#D1544C'}"/>`).join("");return`<line x1="0" y1="${ty.toFixed(1)}" x2="${w}" y2="${ty.toFixed(1)}" stroke="#BE8A2C" stroke-width="1" stroke-dasharray="3 3"/><path d="${d}" fill="none" stroke="#0E7C66" stroke-width="2"/>${dots}`;}
+const ICAI_LINKS={past:"https://boslive.icai.org/education_content.php?p=Question+Papers",ans:"https://boslive.icai.org/education_content.php?p=Suggested+Answers",rtp:"https://boslive.icai.org/education_content_rtp.php?c=Final",mtp:"https://boslive.icai.org/education_content_mtp.php?c=Final",bos:"https://boslive.icai.org/"};
+function renderVault(){const wrap=$("#vaultList");wrap.innerHTML="";const years=[2026,2025,2024,2023,2022,2021];for(const k of ORDER){if(!S.vault[k])S.vault[k]=[];const open=SUBJECTS[k]._vopen;const v=document.createElement("div");v.className="vault-subj"+(open?" open":"");
+  v.innerHTML=`<div class="vault-head"><div class="subj-tag" style="width:30px;height:30px;font-size:11px;background:${SUBJECTS[k].color}">${SUBJECTS[k].name}</div><span>${SUBJECTS[k].full}</span><span class="caret" style="margin-left:auto">▶</span></div>
+   <div class="vault-body"><div class="muted" style="margin-bottom:8px">Cover the last 6 years: ${years.join(" · ")}</div>
+   <div class="vault-links"><a href="${ICAI_LINKS.past}" target="_blank" rel="noopener">↗ Past papers</a><a href="${ICAI_LINKS.ans}" target="_blank" rel="noopener">↗ Suggested answers (ICAI)</a><a href="${ICAI_LINKS.rtp}" target="_blank" rel="noopener">↗ RTP</a><a href="${ICAI_LINKS.mtp}" target="_blank" rel="noopener">↗ MTP</a><a href="${ICAI_LINKS.bos}" target="_blank" rel="noopener">↗ BoS Portal</a></div>
+   <div class="row-flex" style="margin-top:6px"><input type="text" class="vlab" placeholder="Label (e.g. May-2025)" style="width:180px"><input type="text" class="vurl" placeholder="Paste exact PDF link" style="flex:1;min-width:160px"><button class="btn tiny vadd">+ pin</button></div><div class="pinned" style="margin-top:8px"></div></div>`;
+  v.querySelector(".vault-head").addEventListener("click",()=>{SUBJECTS[k]._vopen=!SUBJECTS[k]._vopen;renderVault();});
+  if(open){const pin=v.querySelector(".pinned");pin.innerHTML=S.vault[k].length?S.vault[k].map((p,i)=>`<div class="row-flex" style="margin-bottom:5px"><a href="${p.url}" target="_blank" rel="noopener" style="font-weight:600">↗ ${p.lab}</a><button class="btn ghost tiny" data-vd="${i}">remove</button></div>`).join(""):`<div class="muted">No links pinned yet.</div>`;pin.querySelectorAll("[data-vd]").forEach(b=>b.addEventListener("click",()=>{S.vault[k].splice(+b.dataset.vd,1);saveState();renderVault();}));v.querySelector(".vadd").addEventListener("click",()=>{const lab=v.querySelector(".vlab").value.trim(),url=v.querySelector(".vurl").value.trim();if(!lab||!url){toast("Add label and link");return;}S.vault[k].push({lab,url:url.startsWith("http")?url:"https://"+url});saveState();renderVault();});}
+  wrap.appendChild(v);}}
+function renderLeech(){const wrap=$("#leechList");wrap.innerHTML="";const open=S.leech.filter(l=>!l.done),done=S.leech.filter(l=>l.done);const badge=$("#leechBadge");if(open.length){badge.style.display="inline-block";badge.textContent=open.length;}else badge.style.display="none";if(!S.leech.length){wrap.innerHTML=`<div class="empty">Nothing here yet. Failed test questions and mock mistakes land here — your final-month revision map.</div>`;return;}const make=l=>{const el=document.createElement("div");el.className="leech"+(l.done?" done":"");el.innerHTML=`<div class="chk task" style="width:20px;height:20px;border:2px solid var(--line-strong);border-radius:6px;background:#fff;display:grid;place-items:center;padding:0;cursor:pointer">${l.done?"✓":""}</div><div class="lx"><div class="t">${escapeHtml(l.text)}</div><div class="s">${l.subj?SUBJECTS[l.subj].name:"general"} · ${new Date(l.date).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</div></div><button class="btn ghost tiny" data-lx>✕</button>`;el.querySelector(".chk").addEventListener("click",()=>{l.done=!l.done;saveState();renderLeech();});el.querySelector("[data-lx]").addEventListener("click",()=>{S.leech=S.leech.filter(x=>x.id!==l.id);saveState();renderLeech();});return el;};open.forEach(l=>wrap.appendChild(make(l)));if(done.length){const h=document.createElement("div");h.className="muted";h.style.margin="14px 0 8px";h.textContent="Cleared";wrap.appendChild(h);done.forEach(l=>wrap.appendChild(make(l)));}}
+function renderWell(){const days=lastNDates(14);const moods=days.map(d=>S.days[d]?.mood||0);$("#moodSpark").innerHTML=lineChart(moods,1,5,300,54,"#7A4FB5");const recent=moods.filter(m=>m>0);let msg="No check-ins yet — tap a face up top each day.";if(recent.length>=3){const half=Math.floor(recent.length/2);const a=avg(recent.slice(0,half)),b=avg(recent.slice(half));if(b<a-0.6)msg="⚠️ Mood drifting down. Take a real lighter day — it's part of the plan.";else if(avg(recent)>=4)msg="Good wave. Bank momentum, keep the rest days.";else msg="Holding steady. Keep checking in daily.";}$("#moodReadout").textContent=msg;
+  const weeks=lastNWeeks(8);const hrs=weeks.map(wk=>wk.reduce((s,d)=>s+(S.days[d]?.hours||0),0));const ph2=weeks.map(wk=>!inPhase1(wk[wk.length-1]));$("#hoursChart").innerHTML=barChart(hrs,weeks.map((wk,i)=>ph2[i]?90:28));const tw=inPhase1(todayStr())?28:90;$("#hoursReadout").textContent=`This week: ${(hrs[hrs.length-1]||0).toFixed(1)} h · target ≈ ${tw} h`;
+  const rw=$("#restWarn");rw.innerHTML="";const last7=lastNDates(7).map(d=>(S.days[d]?.hours||0)>=10);if(last7.every(x=>x)&&!inPhase1(todayStr()))rw.innerHTML=`<div class="warn">🛑 Seven heavy days in a row. This is where focus erodes and silly mistakes creep in. Take a genuine lighter day tomorrow — protecting it is protecting your rank.</div>`;
+  $("#motivLine").textContent="“"+MOTIV[Math.floor(Date.now()/86400000)%MOTIV.length]+"”";$("#whyNote").value=S.why||"";}
+function lastNDates(n){const o=[];for(let i=n-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);o.push(d.toLocaleDateString('en-CA'));}return o;}
+function lastNWeeks(n){const o=[];for(let w=n-1;w>=0;w--){const wk=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-(w*7+i));wk.push(d.toLocaleDateString('en-CA'));}o.push(wk);}return o;}
+function avg(a){return a.length?a.reduce((s,x)=>s+x,0)/a.length:0;}
+function lineChart(vals,min,max,w,h,col){const pts=vals.map((v,i)=>({v,i})).filter(p=>p.v>0);if(pts.length<1)return`<line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="#E6E0D4" stroke-width="1.5"/>`;const xs=i=>i/(vals.length-1)*(w-8)+4,ys=v=>h-8-((v-min)/(max-min))*(h-16);const d=pts.map((p,k)=>`${k?'L':'M'}${xs(p.i).toFixed(1)},${ys(p.v).toFixed(1)}`).join("");const dots=pts.map(p=>`<circle cx="${xs(p.i).toFixed(1)}" cy="${ys(p.v).toFixed(1)}" r="2.6" fill="${col}"/>`).join("");return`<path d="${d}" fill="none" stroke="${col}" stroke-width="2"/>${dots}`;}
+function barChart(vals,targets){const w=300,h=54,n=vals.length,bw=(w-(n-1)*6)/n;const maxv=Math.max(...vals,...targets,1);let out="";vals.forEach((v,i)=>{const x=i*(bw+6);const bh=(v/maxv)*(h-10);const th=(targets[i]/maxv)*(h-10);const ok=v>=targets[i]*0.85;out+=`<rect x="${x.toFixed(1)}" y="${(h-bh).toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="2" fill="${ok?'#0E7C66':'#BE8A2C'}"/>`;out+=`<line x1="${x.toFixed(1)}" y1="${(h-th).toFixed(1)}" x2="${(x+bw).toFixed(1)}" y2="${(h-th).toFixed(1)}" stroke="#D1544C" stroke-width="1.4" stroke-dasharray="2 2"/>`;});return out;}
+
+/* ============ BAD DAY ============ */
+function enterBadDay(){day(todayStr()).bad=true;saveState();$("#badday").classList.add("show");$$(".view").forEach(v=>v.classList.remove("active"));$("#tabs").style.display="none";const plan=curPlan||genPlan(todayStr());const t=plan.tasks.find(x=>x.hrs>0)||plan.tasks[0];$("#oneTask").innerHTML=`<h3 style="margin:0 0 2px">${t?t.lab:"Rest"}</h3><div class="task-meta">${t?t.hint||"":""}</div><button class="btn" id="oneDone" style="width:100%">Done — that's plenty for today</button>`;$("#oneDone").onclick=()=>{if(t){const dd=day(todayStr());if(!dd.done.includes(t.id))dd.done.push(t.id);saveState();}toast("Proud of you. Rest now. 🌙");};}
+function exitBadDay(){day(todayStr()).bad=false;saveState();$("#badday").classList.remove("show");$("#tabs").style.display="flex";switchView("today");}
+
+/* ============ TABS / COUNTDOWNS ============ */
+function switchView(v){$$(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));$$(".view").forEach(el=>el.classList.toggle("active",el.id==="view-"+v));if(v==="subjects")renderSubjects();if(v==="marks")renderMarks();if(v==="mocks")renderMocks();if(v==="papers")renderVault();if(v==="leech")renderLeech();if(v==="well")renderWell();if(v==="today")renderToday();}
+function renderCountdowns(){const d=todayStr();$("#cdAttempt").textContent=Math.max(0,daysBetween(d,ATTEMPT));$("#cdGate").textContent=Math.max(0,daysBetween(d,GATE));const p1=inPhase1(d);$("#phaseTxt").innerHTML=p1?`<b>Phase 1</b> — 4 hrs/day · master Group 1 + first pass GST · DT · IBS`:(daysBetween(d,ATTEMPT)<=49?`<b>Final stretch</b> — mocks + targeted revision`:`<b>Phase 2</b> — 13–15 hrs/day · 3–4 revisions both groups`);let s=0;for(let i=0;i<400;i++){const dt=new Date();dt.setDate(dt.getDate()-i);const key=dt.toLocaleDateString('en-CA');const dy=S.days[key];const active=dy&&((dy.hours||0)>0||(dy.done&&dy.done.length));if(i===0&&!active)continue;if(active)s++;else break;}$("#streakBox").textContent="🔥 "+s;}
+function bindMood(){$$("#moodQuick .emoji-btn").forEach(b=>b.addEventListener("click",()=>{day(todayStr()).mood=+b.dataset.mood;saveState();$$("#moodQuick .emoji-btn").forEach(x=>x.classList.toggle("sel",x===b));toast("Mood logged");}));}
+
+/* ============ DAILY QUOTE ============ */
+function showDailyQuote(force){
+  const d=todayStr();
+  if(!force && S.lastQuote===d) return;
+  S.lastQuote=d; saveState();
+  const idx=Math.floor(new Date(d)/86400000)%RANKQUOTES.length;
+  $("#quoteText").textContent="“"+RANKQUOTES[idx]+"”";
+  const left=Math.max(0,daysBetween(d,ATTEMPT));
+  $("#quoteDays").innerHTML=`<b>${left}</b> days to May 2027 · target band <b>404–419</b>`;
+  $("#quoteModal").classList.add("show");
+}
+function hideQuote(){$("#quoteModal").classList.remove("show");}
+
+/* ============ CLOUD SYNC (optional Firebase) ============ */
+const FBCFG_KEY="cc_fb_config", FBEN_KEY="cc_fb_enabled";
+let cloud={app:null,auth:null,db:null,user:null,unsub:null,ready:false,pushT:null,myStamp:0,_auth:null,_fs:null,err:""};
+function getCfg(){ try{const v=localStorage.getItem(FBCFG_KEY);return v?JSON.parse(v):null;}catch(e){return null;} }
+function cloudEnabled(){ try{return localStorage.getItem(FBEN_KEY)==="1"&&!!getCfg();}catch(e){return false;} }
+function setSyncPill(txt,cls){const el=$("#syncPill");if(!el)return;el.className="engine "+(cls||"");el.querySelector("#syncTxt").textContent=txt;}
+function rerenderAll(){try{drawGauge();renderCountdowns();const a=document.querySelector('.tab.active');switchView(a?a.dataset.view:"today");}catch(e){}}
+async function cloudInit(){
+  if(!cloudEnabled()){setSyncPill("Sync: off","");return;}
+  if(!lsOK){setSyncPill("Sync: needs hosting","off");return;}
+  setSyncPill("Sync: connecting…","");
+  try{
+    const cfg=getCfg();
+    const appMod=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const authMod=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    const fsMod=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    cloud.app=appMod.initializeApp(cfg);cloud.auth=authMod.getAuth(cloud.app);cloud.db=fsMod.getFirestore(cloud.app);
+    cloud._auth=authMod;cloud._fs=fsMod;cloud.ready=true;
+    authMod.onAuthStateChanged(cloud.auth,u=>{cloud.user=u;onAuthChange();});
+  }catch(e){cloud.err=(e&&e.message)||"load failed";setSyncPill("Sync: error","off");}
+}
+async function onAuthChange(){
+  if(cloud.user){
+    setSyncPill("Sync: "+(cloud.user.email||"on"),"live");
+    const {doc,onSnapshot}=cloud._fs;const ref=doc(cloud.db,"users",cloud.user.uid);
+    if(cloud.unsub)cloud.unsub();
+    cloud.unsub=onSnapshot(ref,snap=>{const d=snap.data();if(d&&d.data&&d.updatedAt&&d.updatedAt!==cloud.myStamp){try{S=JSON.parse(d.data);saveLocalOnly();rerenderAll();toast("Synced from another device");}catch(e){}}},err=>{setSyncPill("Sync: rules?","off");});
+    cloudPush();
+  } else { setSyncPill("Sync: sign in","off"); if(cloud.unsub){cloud.unsub();cloud.unsub=null;} }
+  if($("#syncModal").classList.contains("show"))renderSync();
+}
+function cloudPush(){
+  if(!cloud.ready||!cloud.user)return;
+  clearTimeout(cloud.pushT);
+  cloud.pushT=setTimeout(async()=>{try{const {doc,setDoc}=cloud._fs;cloud.myStamp=Date.now();await setDoc(doc(cloud.db,"users",cloud.user.uid),{data:JSON.stringify(S),updatedAt:cloud.myStamp,v:2});}catch(e){}},600);
+}
+function openSync(){$("#syncModal").classList.add("show");renderSync();}
+function closeSync(){$("#syncModal").classList.remove("show");}
+function renderSync(){
+  const b=$("#syncBody");
+  if(!lsOK){b.innerHTML=`<div class="warn">☁ Cloud sync needs the app opened from a web address (https://…), not as a local file or inside Claude. Host it once — e.g. drag this file onto <a href="https://app.netlify.com/drop" target="_blank" rel="noopener">app.netlify.com/drop</a> — then open the https link and set up sync here.</div>`;return;}
+  if(!cloudEnabled()){
+    b.innerHTML=`<div class="calm">One-time setup. Create a free Firebase project, then paste its web config below. Full steps are in the chat. Your config isn't secret — your data is protected by login + security rules.</div>
+      <div class="field"><label>Paste your Firebase config (the { apiKey … } object)</label><textarea id="fbCfgIn" style="min-height:120px;font-family:'IBM Plex Mono',monospace;font-size:12px" placeholder='{ "apiKey":"…", "authDomain":"…", "projectId":"…", "appId":"…" }'></textarea></div>
+      <button class="btn teal" id="fbSave">Save & connect</button>`;
+    b.querySelector("#fbSave").onclick=()=>{let raw=$("#fbCfgIn").value.trim();try{raw=raw.replace(/^const\s+\w+\s*=\s*/,"").replace(/;$/,"");const cfg=(new Function("return ("+raw+")"))();if(!cfg.apiKey||!cfg.projectId)throw 0;localStorage.setItem(FBCFG_KEY,JSON.stringify(cfg));localStorage.setItem(FBEN_KEY,"1");toast("Config saved — connecting");cloudInit().then(renderSync);}catch(e){toast("That config didn't parse — paste the full { … } object");}};
+    return;
+  }
+  if(!cloud.ready){b.innerHTML=`<div class="calm">Connecting to your Firebase project…</div>${cloud.err?`<div class="warn" style="margin-top:10px">Couldn't connect: ${escapeHtml(cloud.err)}. Re-check your config.</div>`:""}<button class="btn" id="fbReset">Re-enter config</button>`;b.querySelector("#fbReset").onclick=()=>{localStorage.removeItem(FBEN_KEY);renderSync();};return;}
+  if(!cloud.user){
+    b.innerHTML=`<div class="calm">Use the <b>same email & password on every device</b> to sync. New here? Create the account once, then just log in on your other devices.</div>
+      <div class="field"><label>Email</label><input type="text" id="fbEmail" placeholder="you@email.com"></div>
+      <div class="field"><label>Password (min 6 chars)</label><input type="text" id="fbPass" placeholder="choose a password"></div>
+      <div class="row-flex"><button class="btn teal" id="fbLogin">Log in</button><button class="btn" id="fbSignup">Create account</button><button class="btn ghost tiny" id="fbReset2">Change project</button></div>
+      <div id="fbMsg" class="muted" style="margin-top:8px"></div>`;
+    const em=()=>$("#fbEmail").value.trim(),pw=()=>$("#fbPass").value;
+    b.querySelector("#fbLogin").onclick=async()=>{try{await cloud._auth.signInWithEmailAndPassword(cloud.auth,em(),pw());}catch(e){$("#fbMsg").textContent=(e.code||e.message||"login failed");}};
+    b.querySelector("#fbSignup").onclick=async()=>{try{await cloud._auth.createUserWithEmailAndPassword(cloud.auth,em(),pw());toast("Account created & synced");}catch(e){$("#fbMsg").textContent=(e.code||e.message||"signup failed");}};
+    b.querySelector("#fbReset2").onclick=()=>{localStorage.removeItem(FBEN_KEY);cloud.ready=false;renderSync();};
+    return;
+  }
+  b.innerHTML=`<div class="calm">✓ Signed in as <b>${escapeHtml(cloud.user.email||"user")}</b>. Your progress now syncs automatically — edit on any device and the others update when open.</div>
+    <div class="row-flex"><button class="btn" id="fbPush">Force sync now</button><button class="btn ghost" id="fbOut">Sign out</button></div>`;
+  b.querySelector("#fbPush").onclick=()=>{cloud.myStamp=0;cloudPush();toast("Pushed to cloud");};
+  b.querySelector("#fbOut").onclick=async()=>{try{await cloud._auth.signOut(cloud.auth);}catch(e){}renderSync();};
+}
+
+/* ============ INIT ============ */
+async function probeEngine(){
+  try{ await callAI("Reply with exactly: ok","ping"); setEngine("live"); }
+  catch(e){ setEngine("offline"); }
+}
+async function init(){
+  const loaded=await loadState();
+  if(loaded&&loaded.ver===2){S=loaded;}
+  else if(loaded&&loaded.subjects){ // migrate v1 (done:bool) -> v2
+    S=freshState();S.targets=loaded.targets||S.targets;S.mocks=loaded.mocks||[];S.leech=loaded.leech||[];S.days=loaded.days||{};S.why=loaded.why||"";S.vault=loaded.vault||{};
+    for(const k of ORDER){const old=loaded.subjects[k];if(old){S.subjects[k].round=old.round||0;(old.chapters||[]).forEach((c,i)=>{if(S.subjects[k].chapters[i]&&c.done){S.subjects[k].chapters[i].learned=true;}});}}
+    saveState();
+  } else { S=freshState(); }
+  for(const k of ORDER){if(!S.subjects[k])S.subjects[k]={round:0,chapters:SUBJECTS[k].chapters.map(freshChapter),paper:null};if(!S.vault)S.vault={};}
+  const opt=ORDER.map(k=>`<option value="${k}">${SUBJECTS[k].name} — ${SUBJECTS[k].full}</option>`).join("");
+  $("#mkSubj").innerHTML=opt;$("#lcSubj").innerHTML=`<option value="">General</option>`+opt;$("#mkDate").value=todayStr();
+  $$(".tab").forEach(t=>t.addEventListener("click",()=>switchView(t.dataset.view)));
+  $("#hoursIn").addEventListener("input",e=>{day(todayStr()).hours=+e.target.value||0;saveState();renderCountdowns();});
+  $$("#energyRow .emoji-btn").forEach(b=>b.addEventListener("click",()=>{day(todayStr()).energy=+b.dataset.energy;saveState();$$("#energyRow .emoji-btn").forEach(x=>x.classList.toggle("sel",x===b));}));
+  $("#mkAdd").addEventListener("click",()=>{const subj=$("#mkSubj").value,content=+$("#mkContent").value||0,pres=+$("#mkPres").value||0,time=+$("#mkTime").value||0,date=$("#mkDate").value||todayStr();if(content===0&&pres===0){toast("Enter a score");return;}S.mocks.push({id:Date.now()+""+Math.random().toFixed(3).slice(2),subj,content,pres,total:content+pres,time,date});const lk=$("#mkLeech").value.trim();if(lk){S.leech.push({id:Date.now()+"l",text:lk,subj,date,done:false});$("#mkLeech").value="";}$("#mkContent").value="";$("#mkPres").value="";$("#mkTime").value="";saveState();renderMocks();drawGauge();renderLeech();toast("Paper logged");});
+  $("#lcAdd").addEventListener("click",()=>{const text=$("#lcText").value.trim();if(!text){toast("Type the weak concept");return;}S.leech.push({id:Date.now()+"l",text,subj:$("#lcSubj").value,date:todayStr(),done:false});$("#lcText").value="";saveState();renderLeech();});
+  $("#whyNote").addEventListener("input",e=>{S.why=e.target.value;saveState();});
+  $("#badDayBtn").addEventListener("click",enterBadDay);$("#exitBadDay").addEventListener("click",exitBadDay);
+  $("#exClose").addEventListener("click",()=>{if(FP&&FP.timer)clearInterval(FP.timer);closeExaminer();});
+  $("#examModal").addEventListener("click",e=>{if(e.target.id==="examModal"){if(FP&&FP.timer)clearInterval(FP.timer);closeExaminer();}});
+  $("#resetBtn").addEventListener("click",async()=>{if(!confirm("Reset everything — chapters, tests, mocks, logs? Can't be undone. (Tip: Export a backup first.)"))return;S=freshState();if(hasStore){try{await window.storage.delete(KEY);}catch(e){}}if(lsOK){try{localStorage.removeItem(KEY);}catch(e){}}mem=null;saveState();location.reload();});
+  $("#exportBtn").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="ca-command-center-backup-"+todayStr()+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast("Backup downloaded — keep it safe");});
+  $("#importBtn").addEventListener("click",()=>$("#importFile").click());
+  $("#importFile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!data||!data.subjects||!data.targets){toast("That file isn't a valid backup");return;}if(!confirm("Replace all current progress with this backup? Your current data will be overwritten."))return;S=data;saveState();toast("Progress restored");setTimeout(()=>location.reload(),400);}catch(err){toast("Couldn't read that file");}};r.readAsText(f);e.target.value="";});
+  $("#footNote").innerHTML=`Personal study tool. Chapter lists follow the ICAI new-scheme CA Final papers; weightage tags are <b>trend-based estimates</b> — refine against ICAI's published weightage on the <a href="https://boslive.icai.org/" target="_blank" rel="noopener">BoS Knowledge Portal</a>. The live examiner generates fresh questions when connected and falls back to a self-graded set when not; treat AI-generated questions as high-quality practice, and always cross-check technical specifics against ICAI material before relying on them. Your data is saved on this device/profile only.`;
+  bindMood();
+  const m=day(todayStr()).mood;$$("#moodQuick .emoji-btn").forEach(b=>b.classList.toggle("sel",+b.dataset.mood===m));
+  drawGauge();renderCountdowns();renderToday();
+  setInterval(renderCountdowns,60000);
+  $("#quoteGo").addEventListener("click",hideQuote);
+  $("#quoteModal").addEventListener("click",e=>{if(e.target.id==="quoteModal")hideQuote();});
+  $("#syncPill").addEventListener("click",openSync);
+  $("#syncClose").addEventListener("click",closeSync);
+  $("#syncModal").addEventListener("click",e=>{if(e.target.id==="syncModal")closeSync();});
+  showDailyQuote(false);
+  probeEngine();
+  cloudInit();
+}
+init();
+</script>
+</body>
+</html>
